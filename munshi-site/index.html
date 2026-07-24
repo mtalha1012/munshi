@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Munshi: Court hearing dates on your Google Calendar, automatically</title>
+  <meta name="description" content="Munshi is a free Windows app that keeps a lawyer's Google Calendar in step with court hearing dates from the District Judiciary Punjab. Add a case once and it tracks every hearing for you." />
+  <link rel="canonical" href="https://munshi.mtalhasajid.dev/" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#15191d" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Munshi" />
+  <meta property="og:title" content="Munshi · Never miss a hearing" />
+  <meta property="og:description" content="A free Windows app that syncs court hearing dates from the District Judiciary Punjab straight to a lawyer's Google Calendar." />
+  <meta property="og:url" content="https://munshi.mtalhasajid.dev/" />
+  <meta property="og:image" content="https://munshi.mtalhasajid.dev/og.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Munshi · Never miss a hearing" />
+  <meta name="twitter:image" content="https://munshi.mtalhasajid.dev/og.svg" />
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="fonts/alata-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/mada-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Munshi",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Windows 10, Windows 11",
+    "url": "https://munshi.mtalhasajid.dev/",
+    "downloadUrl": "https://github.com/mtalha1012/munshi/releases",
+    "description": "Munshi is a free Windows desktop app that keeps a lawyer's Google Calendar in step with court hearing dates from the District Judiciary Punjab case-search website.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Muhammad Talha", "url": "https://mtalhasajid.dev" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Is Munshi free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Munshi is completely free to download and use." } },
+      { "@type": "Question", "name": "Which courts does Munshi cover?", "acceptedAnswer": { "@type": "Answer", "text": "Munshi reads hearing dates from the District Judiciary Punjab case-search website. Coverage is currently focused on Lahore and grows as the site adds districts." } },
+      { "@type": "Question", "name": "Is my Google data safe?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Munshi runs entirely on your own computer. There is no Munshi server, and your Google tokens and case data never leave your device." } },
+      { "@type": "Question", "name": "Which operating systems does Munshi support?", "acceptedAnswer": { "@type": "Answer", "text": "Munshi is a Windows desktop application for Windows 10 and Windows 11." } }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="index.html" aria-label="Munshi home">
+        <span class="mark" aria-hidden="true"></span>
+        <b>Munshi</b>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#the-app">The App</a>
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="https://github.com/mtalha1012/munshi" rel="noopener">GitHub</a>
+      </nav>
+      <a class="btn btn-gold nav-dl" data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">Download</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="wordmark" aria-label="Munshi"><span>M</span><span>u</span><span>n</span><span>s</span><span>h</span><span>i</span></div>
+      <div class="hero-rule"></div>
+      <p class="hero-tag">Munshi keeps your Google Calendar in step with your cases' court hearing dates. It checks once a day, on its own, and never lets a date slip.</p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Download for Windows
+        </a>
+        <a class="btn btn-out-light" href="#how">See how it works</a>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="wrap facts-row">
+        <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Free to use</span>
+        <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Runs on your own PC</span>
+        <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> No cloud account</span>
+        <span class="fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Windows 10 and 11</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE APP -->
+  <section class="lede" id="the-app">
+    <div class="wrap lede-grid">
+      <div class="reveal">
+        <span class="sec-eyebrow">The app</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">A clerk for your cause list.</h2></div>
+        <p>In Punjab's district courts, a hearing date can move without warning. Munshi does what a diligent munshi would: it watches the court's case-search site every day, notes the next date for each of your cases, and keeps a matching event on your Google Calendar.</p>
+        <p>You add a case once. From then on Munshi handles the checking, the moving, and the rebuilding, quietly in the background, so the date is always where you expect it.</p>
+        <a class="btn btn-dark" data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">Download Munshi</a>
+      </div>
+      <div class="lede-panel reveal">
+        <div class="lede-stat"><div class="k">Once a day</div><div class="kl">Every case checked, in the background</div></div>
+        <div class="lede-stat"><div class="k">Zero</div><div class="kl">Servers of ours your data ever touches</div></div>
+        <div class="lede-stat"><div class="k">Three</div><div class="kl">The only sites Munshi ever connects to</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-eyebrow">How it works</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">Add a case once. Munshi watches it every day.</h2></div>
+      </div>
+      <div class="how-grid">
+        <div class="reveal">
+          <div class="tabs" role="tablist">
+            <button class="tab" role="tab" aria-selected="true" data-tab="t1">Add a case</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="t2">Daily check</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="t3">Stays in sync</button>
+          </div>
+          <div class="tab-panel" id="t1" data-active>
+            <span class="step-n">STEP 01</span>
+            <h3>Add a case</h3>
+            <p>Enter the case number and district. That is all Munshi needs to find it on the District Judiciary Punjab search site.</p>
+          </div>
+          <div class="tab-panel" id="t2">
+            <span class="step-n">STEP 02</span>
+            <h3>Munshi checks daily</h3>
+            <p>Once a day, quietly in the background, it looks up the next hearing date and reads the site's captcha and results for you.</p>
+          </div>
+          <div class="tab-panel" id="t3">
+            <span class="step-n">STEP 03</span>
+            <h3>Your calendar stays right</h3>
+            <p>It puts an event on that date, moves it when the hearing is adjourned, and rebuilds it if it is ever deleted.</p>
+          </div>
+        </div>
+        <div class="event-card reveal" role="img" aria-label="Illustrative calendar event created by Munshi, showing a hearing moved to a new date">
+          <div class="event-card__head"><span class="mark"></span> Google Calendar · created by Munshi</div>
+          <div class="event-card__body">
+            <div class="event-card__title">Hearing: Ahmad v. The State</div>
+            <div class="event-card__meta">Sessions Court, Lahore · stage: Arguments</div>
+            <div class="event-row">
+              <div class="event-date"><div class="m">Sep</div><div class="d">9</div></div>
+              <div class="event-row__text">
+                <div class="t">All day, with a reminder the evening before</div>
+                <div class="s">Moved here after the last hearing was adjourned</div>
+              </div>
+            </div>
+            <div class="event-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Kept current on its own. You never touch it.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-eyebrow">What it does</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">Built so a case is never quietly unprotected.</h2></div>
+        <p class="sec-sub">Munshi's one job is that you never miss a hearing, so the sync has no silent holes. A case is either covered by a real event or flagged for your attention.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature reveal">
+          <div class="feature__n">01</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+          <h3>Tracks a real event</h3>
+          <p>Each case is tied to an actual Google Calendar event that Munshi creates and remembers, not a guess from a title.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__n">02</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>
+          <h3>Follows adjournments</h3>
+          <p>When a hearing moves to a new date, Munshi moves the same event. No stale copy left behind, no duplicate.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__n">03</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 7v5l3 2"/><path d="M16 3h5v5"/></svg>
+          <h3>Self-heals</h3>
+          <p>Delete the event by mistake and the next run rebuilds it. A deleted event can't cost you a hearing.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__n">04</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <h3>Your edits win</h3>
+          <p>Rename the event or change its reminder in Google Calendar and those edits carry forward to future hearings.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__n">05</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+          <h3>Keeps history</h3>
+          <p>Once a hearing date passes, that event stays put and a fresh one is made for the next date. Munshi never deletes anything.</p>
+        </article>
+        <article class="feature reveal">
+          <div class="feature__n">06</div>
+          <svg class="feature__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 3 2 4 2 7h10c0-3 2-4 2-7a7 7 0 0 0-7-7Z"/><path d="M9 22h6"/></svg>
+          <h3>Runs quietly</h3>
+          <p>Once a day in the background, and it can start at login. No window to keep open, nothing to remember.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="privacy-band" id="privacy">
+    <div class="wrap privacy-grid">
+      <div class="reveal">
+        <span class="sec-eyebrow">Privacy by design</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">Your cases stay on your computer.</h2></div>
+        <p class="sec-sub">Munshi has no server of its own. Read exactly what it touches in the <a href="privacy.html">privacy policy</a>.</p>
+      </div>
+      <div class="pv-list reveal">
+        <div class="pv-item">
+          <span class="mark"></span>
+          <div><div class="t">Nothing leaves your device</div><div class="d">Your Google sign-in and case list are stored only in your own Windows profile. We never receive them.</div></div>
+        </div>
+        <div class="pv-item">
+          <span class="mark"></span>
+          <div><div class="t">Three destinations, no more</div><div class="d">Munshi talks only to Google (your calendar), the District Judiciary Punjab site, and GitHub (for updates).</div></div>
+        </div>
+        <div class="pv-item">
+          <span class="mark"></span>
+          <div><div class="t">No ads, no telemetry in the app</div><div class="d">The desktop app shows no ads, sends no usage tracking, and never sells your data.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILD -->
+  <section class="build" id="built">
+    <div class="wrap build-grid">
+      <div class="reveal">
+        <span class="sec-eyebrow">How it's built</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">Dependable, not clever.</h2></div>
+        <p>Munshi is an Electron desktop app. No Python, no browser driver, nothing extra to install. A hidden window reads the court site, captcha and all, in the same process, and the sync engine that decides to create, move, or rebuild an event is pure, deterministic TypeScript covered by unit tests.</p>
+        <p>Google Calendar is the source of truth. Sign-in uses the OAuth 2.0 authorization-code flow with PKCE, so your password is only ever typed on Google's own page.</p>
+        <div class="stack">
+          <span class="chip">Electron</span>
+          <span class="chip">React</span>
+          <span class="chip">TypeScript</span>
+          <span class="chip">Google Calendar API</span>
+          <span class="chip">Vitest</span>
+        </div>
+        <p class="more"><a href="https://github.com/mtalha1012/munshi" rel="noopener">Read the source on GitHub</a></p>
+      </div>
+      <div class="code-card reveal" aria-hidden="true">
+        <div class="code-card__top"><i></i><i></i><i></i></div>
+        <div class="code-card__body">
+<span class="c">// the whole sync, in one decision</span><br />
+<span class="k">const</span> action = decide(tracked, hearingDate)<br /><br />
+<span class="c">// create | move | recreate | noop</span><br />
+<span class="k">if</span> (action === <span class="k">'move'</span>) moveEvent(id, date)<br />
+<span class="k">if</span> (action === <span class="k">'recreate'</span>) rebuild(spec, date)<br /><br />
+<span class="c">// a case is never silently unprotected</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-eyebrow">Questions</span>
+        <div class="sec-mark"><span class="mark" aria-hidden="true"></span><h2 class="sec-title">Good to know</h2></div>
+      </div>
+      <div class="faq reveal">
+        <details>
+          <summary>Is Munshi free?<span class="ind">+</span></summary>
+          <div class="answer">Yes. Munshi is completely free to download and use.</div>
+        </details>
+        <details>
+          <summary>Which courts does it cover?<span class="ind">+</span></summary>
+          <div class="answer">Munshi reads hearing dates from the District Judiciary Punjab case-search website (dsjlahore.punjab.gov.pk). Coverage there is currently focused on Lahore and grows as the site adds districts.</div>
+        </details>
+        <details>
+          <summary>Is my Google data safe?<span class="ind">+</span></summary>
+          <div class="answer">Yes. Munshi runs entirely on your own computer, so there is no Munshi server. Your Google tokens and case data never leave your device, and it only touches the events it creates or that you link to a case. Full detail is in the <a href="privacy.html">privacy policy</a>.</div>
+        </details>
+        <details>
+          <summary>Do I need to keep the app open?<span class="ind">+</span></summary>
+          <div class="answer">No. Munshi checks your cases once a day in the background and can start quietly at login. Because it is a desktop app rather than a server, the daily run happens whenever your PC is on.</div>
+        </details>
+        <details>
+          <summary>What are the system requirements?<span class="ind">+</span></summary>
+          <div class="answer">A Windows 10 or Windows 11 PC and a Google account. The installer is a standard Windows setup with no extra runtimes to install.</div>
+        </details>
+        <details>
+          <summary>Will it change events I made myself?<span class="ind">+</span></summary>
+          <div class="answer">No. Munshi only manages the event it created for each tracked case, or one you explicitly link. Any edits you make to it are respected and carried forward.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap inner">
+      <span class="mark" aria-hidden="true"></span>
+      <h2>Put your hearings on autopilot.</h2>
+      <p>Download Munshi, sign in with Google, and add your first case in under a minute.</p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Download for Windows
+        </a>
+        <a class="btn btn-out-light" href="https://github.com/mtalha1012/munshi" rel="noopener">View on GitHub</a>
+      </div>
+      <p class="sub">Free · Windows 10 and 11 · unsigned build shows a standard SmartScreen prompt</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="index.html" aria-label="Munshi home">
+            <span class="mark" aria-hidden="true"></span>
+            <b>Munshi</b>
+          </a>
+          <p class="footer-about">Court hearing dates on your Google Calendar, automatically. A quiet clerk for your cause list.</p>
+        </div>
+        <div class="footer-cols">
+          <div class="footer-col">
+            <h4>Product</h4>
+            <a data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">Download</a>
+            <a href="#how">How it works</a>
+            <a href="#features">Features</a>
+            <a href="https://github.com/mtalha1012/munshi" rel="noopener">GitHub</a>
+          </div>
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="privacy.html">Privacy policy</a>
+            <a href="terms.html">Terms of service</a>
+          </div>
+          <div class="footer-col">
+            <h4>Contact</h4>
+            <a href="mailto:support@mtalhasajid.dev">support@mtalhasajid.dev</a>
+            <a href="https://mtalhasajid.dev" rel="noopener">mtalhasajid.dev</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Muhammad Talha. All rights reserved.</span>
+        <span>An independent tool, not affiliated with Google or the District Judiciary Punjab.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- privacy-friendly, cookieless analytics (Vercel Web Analytics) -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script>
+    (function () {
+      // tab switching
+      var tabs = document.querySelectorAll('.tab');
+      tabs.forEach(function (t) {
+        t.addEventListener('click', function () {
+          tabs.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+          t.setAttribute('aria-selected', 'true');
+          document.querySelectorAll('.tab-panel').forEach(function (p) { p.removeAttribute('data-active'); });
+          document.getElementById(t.dataset.tab).setAttribute('data-active', '');
+        });
+      });
+      // reveal on scroll
+      var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { threshold: 0.12 }) : null;
+      document.querySelectorAll('.reveal').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
+      // count download clicks (no personal data)
+      document.querySelectorAll('[data-download]').forEach(function (el) {
+        el.addEventListener('click', function () { try { window.va('event', { name: 'download_click' }); } catch (e) {} });
+      });
+      // mobile menu
+      var mb = document.getElementById('menu-btn'), nl = document.querySelector('.nav-links');
+      mb && mb.addEventListener('click', function () {
+        var open = nl.style.display === 'flex';
+        nl.style.display = open ? '' : 'flex';
+        nl.style.position = 'absolute'; nl.style.top = '76px'; nl.style.left = '0'; nl.style.right = '0';
+        nl.style.flexDirection = 'column'; nl.style.background = '#15191d'; nl.style.padding = open ? '' : '20px 32px';
+        nl.style.gap = '18px'; nl.style.borderBottom = open ? '' : '1px solid rgba(255,255,255,0.14)';
+      });
+    })();
+  </script>
+</body>
+</html>

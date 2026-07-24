@@ -1,0 +1,58 @@
+appId: pk.munshi.app
+productName: Munshi
+copyright: Copyright © 2026 Muhammad Talha
+
+# Stable installer name (no version, no space) so the GitHub "latest" download
+# permalink never changes: .../releases/latest/download/Munshi-Setup.exe
+artifactName: Munshi-Setup.${ext}
+
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  # Source artwork is not needed at runtime — the logo ships as vector inside the
+  # renderer bundle (components/munshi-logo.tsx) and as build/icon.ico.
+  - '!*.png'
+  - '!build/*'
+
+# The compiled main/preload/renderer output that electron-vite produces.
+asarUnpack:
+  - resources/**
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false                 # show the assisted install wizard
+  perMachine: false               # install for the current user (no admin needed)
+  allowToChangeInstallationDirectory: true   # keep the folder-choice page
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Munshi
+  # Munshi-branded wizard graphics (slate theme). The header strip blends with
+  # the wizard's native header; the sidebar brands the welcome/finish panel.
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
+  installerHeader: build/installerHeader.bmp
+  installerSidebar: build/installerSidebar.bmp
+  uninstallerSidebar: build/installerSidebar.bmp
+
+# ---- Auto-update ----
+# Releases are hosted on GitHub Releases (free, unlimited download bandwidth).
+# `build:win:publish` uploads the installer, latest.yml and blockmap to a release
+# on this repo; the installed app checks the same repo for updates.
+publish:
+  - provider: github
+    owner: mtalha1012
+    repo: munshi

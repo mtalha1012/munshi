@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy · Munshi</title>
+  <meta name="description" content="How Munshi handles your data: the app runs entirely on your own computer and stores nothing on a server. This page explains the app's data use and the website's privacy-friendly analytics." />
+  <link rel="canonical" href="https://munshi.mtalhasajid.dev/privacy" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#15191d" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Munshi" />
+  <meta property="og:title" content="Privacy Policy · Munshi" />
+  <meta property="og:url" content="https://munshi.mtalhasajid.dev/privacy" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="fonts/alata-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/mada-400.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap nav">
+      <a class="brand" href="index.html" aria-label="Munshi home">
+        <span class="mark" aria-hidden="true"></span><b>Munshi</b>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#features">Features</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+      </nav>
+      <a class="btn btn-gold nav-dl" data-download href="https://github.com/mtalha1012/munshi/releases" rel="noopener">Download</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </header>
+
+  <main class="wrap doc">
+    <a class="back-home" href="index.html">← Back to home</a>
+    <div class="doc-head">
+      <span class="sec-eyebrow">Privacy Policy</span>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: 24 July 2026</p>
+    </div>
+
+    <div class="prose">
+      <p class="lead">Munshi is a Windows desktop application that helps lawyers keep their Google Calendar in step with court hearing dates from the District Judiciary Punjab case-search website. This policy explains exactly what data Munshi touches, where it is stored, and who it is (and is not) shared with.</p>
+      <p>Munshi is developed and distributed by <strong>Muhammad Talha</strong> (“we”, “us”). If you have any questions, contact us at <a href="mailto:support@mtalhasajid.dev">support@mtalhasajid.dev</a>. This is the same email shown on the app's Google sign-in consent screen.</p>
+
+      <div class="callout">
+        <strong>The short version</strong>
+        <ul>
+          <li>The Munshi app runs entirely <strong>on your own computer</strong>. There is no Munshi server.</li>
+          <li>Your Google sign-in tokens and all your case data are stored <strong>only in your own Windows user profile</strong>. We never receive them.</li>
+          <li>The app talks to exactly three places: <strong>Google</strong> (your calendar), the <strong>District Judiciary Punjab</strong> website, and <strong>GitHub</strong> (to check for updates).</li>
+          <li>The <strong>app</strong> contains no analytics, advertising, or tracking. This <strong>website</strong> uses privacy-friendly, cookieless analytics (visitor counts only), described below.</li>
+        </ul>
+      </div>
+
+      <h2>What data the app accesses</h2>
+      <h3>1. Google Account data</h3>
+      <p>When you sign in with Google, Munshi requests these permissions (scopes):</p>
+      <table>
+        <thead><tr><th>Permission</th><th>Why Munshi needs it</th></tr></thead>
+        <tbody>
+          <tr><td><strong>See and edit events on your calendars</strong> (<code>calendar.events</code>)</td><td>To create a calendar event for each case, move it when a hearing is adjourned, and re-create it if it is deleted. This is the core function of the app.</td></tr>
+          <tr><td><strong>Your email address</strong> and <strong>basic profile</strong> (<code>email</code>, <code>profile</code>, <code>openid</code>)</td><td>Only to show you which Google account is signed in.</td></tr>
+        </tbody>
+      </table>
+      <p>Using these permissions, Munshi:</p>
+      <ul>
+        <li><strong>Reads</strong> the calendar event it is tracking for each case (to check its date and carry forward any edits you made in Google Calendar), and reads your upcoming events so you can view or link them inside the app.</li>
+        <li><strong>Creates and updates</strong> calendar events on the hearing dates it finds.</li>
+      </ul>
+      <p>Munshi does <strong>not</strong> read, modify, or delete any calendar event other than the ones it creates or that you explicitly link to a case. Munshi <strong>never deletes</strong> calendar events.</p>
+
+      <h3>2. Case information you enter</h3>
+      <p>The case number, district, and case name you type are stored <strong>locally on your computer</strong> so Munshi knows what to look up each day.</p>
+
+      <h3>3. Court website lookups</h3>
+      <p>To find hearing dates, Munshi submits the <strong>case number and district</strong> you entered to the public District Judiciary Punjab search website (<code>dsjlahore.punjab.gov.pk</code>), exactly as you would if you searched the site yourself. No Google Account data is ever sent to the court website.</p>
+
+      <h2>Where your data is stored</h2>
+      <p>Everything Munshi keeps lives <strong>on your own device</strong>, inside your Windows user profile (via the operating system's standard local application storage). This includes:</p>
+      <ul>
+        <li>Your Google authentication tokens</li>
+        <li>Your signed-in Google email address</li>
+        <li>Your case list and each case's settings</li>
+        <li>A snapshot of each tracked calendar event (used only to rebuild an event you delete by accident)</li>
+        <li>The result of the most recent sync</li>
+      </ul>
+      <p><strong>None of this data is transmitted to us or to any third-party server.</strong> We, the developers, have no ability to see your tokens, your calendar, or your cases.</p>
+
+      <h2>How Google user data is used, shared, and protected</h2>
+      <p>Munshi's use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google API Services User Data Policy</a>, including the <strong>Limited Use</strong> requirements. Specifically:</p>
+      <ul>
+        <li>Google user data (your calendar events and basic profile) is used <strong>only</strong> to provide the calendar-syncing feature described above, directly visible to you.</li>
+        <li>Google user data is <strong>not</strong> transferred to any third party, except as necessary to provide the feature (that is, communicating with Google's own Calendar API on your behalf).</li>
+        <li>Google user data is <strong>not</strong> used for advertising.</li>
+        <li>Google user data is <strong>not</strong> sold.</li>
+        <li>No humans read your Google user data, except where you give explicit consent for support, to comply with applicable law, or as needed for security.</li>
+      </ul>
+
+      <h2>This website and analytics</h2>
+      <p>The app and the website are separate. The desktop app itself contains <strong>no analytics or telemetry</strong>. The website you are reading (<code>munshi.mtalhasajid.dev</code>) uses <strong>Vercel Web Analytics</strong> to understand basic traffic, such as how many people visit and how many click the download button.</p>
+      <p>This analytics is designed to be privacy-friendly:</p>
+      <ul>
+        <li>It uses <strong>no cookies</strong> and does not store anything on your device.</li>
+        <li>It collects <strong>no personal information</strong> and does not identify you.</li>
+        <li>It does <strong>not</strong> track you across other websites or build an advertising profile.</li>
+        <li>It records only aggregate, anonymous data such as page views, download-button clicks, referrer, approximate country, and device type.</li>
+      </ul>
+      <p>The website is hosted by <strong>Vercel</strong>, which processes this data as our provider. See the <a href="https://vercel.com/legal/privacy-policy" rel="noopener">Vercel Privacy Policy</a> for detail. No Google Account or case data is ever sent to the website or its analytics.</p>
+
+      <h2>Who your data is shared with</h2>
+      <p>The app does not share your data with any third party for our benefit. The only external services it communicates with, and only to make the app work, are:</p>
+      <ul>
+        <li><strong>Google</strong> (<a href="https://policies.google.com/privacy" rel="noopener">Privacy Policy</a>) to sign you in and read or write your calendar events.</li>
+        <li><strong>District Judiciary Punjab</strong> (<code>dsjlahore.punjab.gov.pk</code>) to look up hearing dates using the case number and district you provide.</li>
+        <li><strong>GitHub</strong> (<a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">Privacy Statement</a>). Munshi checks for new versions by downloading update files from its public release page. These carry none of your personal, Google, or case data.</li>
+      </ul>
+
+      <h2>Data retention and deletion</h2>
+      <p>Because your data lives only on your device, <strong>you are in full control of it</strong>:</p>
+      <ul>
+        <li><strong>Sign out</strong> (Settings → Sign out) removes your stored Google tokens and email from your computer.</li>
+        <li><strong>Remove a case</strong> deletes that case from Munshi. This does <strong>not</strong> delete anything already on your Google Calendar.</li>
+        <li><strong>Uninstall Munshi</strong> removes the application. To also remove its locally stored data, delete Munshi's application-data folder in your Windows user profile.</li>
+        <li><strong>Revoke Munshi's access</strong> to your Google Account at any time from <a href="https://myaccount.google.com/connections" rel="noopener">Google Account → Security → Third-party access</a>.</li>
+      </ul>
+      <p>We retain no copy of your data, so there is nothing for us to delete on your behalf.</p>
+
+      <h2>Security</h2>
+      <p>Your Google tokens and case data are stored within your own operating-system user account, protected by your device's login. Google sign-in uses the OAuth 2.0 authorization-code flow with PKCE and a state check, so your Google password is entered only on Google's own website and is never seen by Munshi.</p>
+      <p>No method of storage or transmission is perfectly secure, but because Munshi keeps your data locally and sends it to no server of ours, the surface for remote compromise is minimal.</p>
+
+      <h2>Children</h2>
+      <p>Munshi is a professional tool intended for practising lawyers and is not directed to children under 13 (or the equivalent minimum age in your jurisdiction). We do not knowingly collect data from children.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>We may update this policy from time to time. Material changes will be reflected by a new “Last updated” date at the top of this page. Continued use of Munshi after a change means you accept the revised policy.</p>
+
+      <hr />
+      <h2>Contact</h2>
+      <p>Questions about this policy or your data:</p>
+      <p><strong>Muhammad Talha</strong><br />
+      Email: <a href="mailto:support@mtalhasajid.dev">support@mtalhasajid.dev</a><br />
+      App homepage: <a href="https://munshi.mtalhasajid.dev">https://munshi.mtalhasajid.dev</a></p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border-top:none">
+        <span>© 2026 Muhammad Talha. All rights reserved.</span>
+        <span><a href="index.html">Home</a> · <a href="terms.html">Terms of service</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

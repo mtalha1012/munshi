@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://munshi.mtalhasajid.dev/sitemap.xml

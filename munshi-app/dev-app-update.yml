@@ -1,0 +1,5 @@
+# Used by electron-updater when testing updates in a dev build.
+# Mirrors the "publish" block in electron-builder.yml.
+provider: github
+owner: mtalha1012
+repo: munshi
