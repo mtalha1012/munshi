@@ -3,11 +3,12 @@
 **Munshi keeps a lawyer's Google Calendar in sync with their cases' court hearing
 dates — automatically, once a day, in the background.**
 
-It's a Windows desktop app for lawyers practising in Punjab, Pakistan. You add a
+It's a Windows desktop app for lawyers practising in Punjab, Pakistan (for now). You add a
 case once (its number and district); Munshi looks up the next hearing date on the
 [District Judiciary Punjab](https://dsjlahore.punjab.gov.pk) case-search site each
 day and makes sure a calendar event sits on that date — moving it when a hearing
-is adjourned, and putting it back if you delete it by accident.
+is adjourned, and putting it back if you delete it by accident. (Right now it supports 
+only only one site. More will be added in the future)
 
 > Its one job is that you never miss a hearing, so the sync is designed to have no
 > silent holes: a case is either protected by a real calendar event, or it's
@@ -54,7 +55,7 @@ Google Calendar API · electron-store · electron-updater · vitest.
 Requires Node 20+ (developed on Node 24) and Windows for the installer target.
 
 ```bash
-cd desktop-app
+cd munshi-app
 npm install
 npm run dev          # run in development
 npm test             # run the unit tests
