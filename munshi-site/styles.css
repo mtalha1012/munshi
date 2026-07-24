@@ -93,19 +93,18 @@ section { padding-block: clamp(72px, 9vw, 130px); }
 .hero-inner { position: relative; padding-block: clamp(90px, 15vw, 190px) clamp(70px, 9vw, 120px); }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; font-size: 0.74rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-lt); font-weight: 600; }
 .hero-eyebrow::before { content: ""; width: 34px; height: 1px; background: var(--accent); }
-.wordmark { font-family: var(--display); font-weight: 400; font-size: clamp(3.4rem, 12vw, 9rem); line-height: 0.98; letter-spacing: 0.04em; margin-top: 26px; display: flex; }
-.wordmark span { display: inline-block; opacity: 0; transform: translateY(0.4em); animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
-.wordmark span:nth-child(1) { animation-delay: 0.05s; }
-.wordmark span:nth-child(2) { animation-delay: 0.13s; }
-.wordmark span:nth-child(3) { animation-delay: 0.21s; }
-.wordmark span:nth-child(4) { animation-delay: 0.29s; }
-.wordmark span:nth-child(5) { animation-delay: 0.37s; }
-.wordmark span:nth-child(6) { animation-delay: 0.45s; }
-@keyframes rise { to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .wordmark span { opacity: 1; transform: none; animation: none; } }
-.hero-rule { width: 88px; height: 2px; background: var(--accent); margin-top: 30px; opacity: 0; animation: rise 0.7s 0.6s forwards; }
-.hero-tag { margin-top: 28px; font-size: clamp(1.1rem, 1.8vw, 1.4rem); color: var(--on-dark-soft); max-width: 46ch; line-height: 1.5; opacity: 0; animation: rise 0.7s 0.7s forwards; }
-.hero-cta { margin-top: 38px; display: flex; flex-wrap: wrap; gap: 16px; opacity: 0; animation: rise 0.7s 0.8s forwards; }
+.wordmark { font-family: var(--display); font-weight: 400; font-size: clamp(3.4rem, 12vw, 9rem); line-height: 0.98; letter-spacing: 0.04em; margin-top: 26px; color: var(--on-dark); }
+.hero-rule { width: 88px; height: 2px; background: var(--accent); margin-top: 30px; }
+.hero-tag { margin-top: 26px; font-size: clamp(1.05rem, 1.7vw, 1.3rem); color: var(--on-dark-soft); max-width: 58ch; line-height: 1.55; }
+.hero-cta { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 16px; }
+/* Entrance motion is transform-only and gated behind html.js, so the name and
+   purpose are always readable, including to reviewers/crawlers that don't run it. */
+@keyframes rise { from { transform: translateY(16px); } to { transform: none; } }
+html.js .wordmark { animation: rise 0.7s 0.1s both; }
+html.js .hero-rule { animation: rise 0.7s 0.45s both; }
+html.js .hero-tag { animation: rise 0.7s 0.55s both; }
+html.js .hero-cta { animation: rise 0.7s 0.65s both; }
+@media (prefers-reduced-motion: reduce) { html.js .wordmark, html.js .hero-rule, html.js .hero-tag, html.js .hero-cta { animation: none; } }
 
 /* facts strip (bottom of hero) */
 .facts { position: relative; border-top: 1px solid var(--dark-line); background: rgba(0,0,0,0.18); }
@@ -251,9 +250,10 @@ section { padding-block: clamp(72px, 9vw, 130px); }
 .callout ul { margin-top: 10px; }
 
 /* ---------- reveal ---------- */
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+.reveal { transition: opacity 0.7s ease, transform 0.7s ease; }
+html.js .reveal { opacity: 0; transform: translateY(20px); }
+html.js .reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; transition: none; } }
 
 /* ---------- responsive ---------- */
 @media (max-width: 940px) {
