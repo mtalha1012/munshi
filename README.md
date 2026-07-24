@@ -55,7 +55,7 @@ Google Calendar API · electron-store · electron-updater · vitest.
 Requires Node 20+ (developed on Node 24) and Windows for the installer target.
 
 ```bash
-cd desktop-app
+cd munshi-app
 npm install
 npm run dev          # run in development
 npm test             # run the unit tests
