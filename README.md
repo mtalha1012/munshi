@@ -88,11 +88,6 @@ create once:
 
 ## Security
 
-- **Never commit your OAuth client id/secret.** For a desktop app they are a
-  *public client* (RFC 8252) and are not treated as confidential — they even ship
-  inside the built `.exe` — but committing them invites automated abuse and quota
-  scraping. Pass them via the environment variables above. `oauth-config.ts` in
-  this repo intentionally holds only placeholders.
 - Google sign-in uses PKCE and a `state` check, so an intercepted authorization
   code on the loopback port can't be exchanged for tokens.
 - Your Google tokens are stored only in your own Windows user profile
