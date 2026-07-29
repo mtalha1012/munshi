@@ -16,6 +16,7 @@ const api: MunshiApi = {
 
   authStatus: () => ipcRenderer.invoke('auth:status') as Promise<AuthState>,
   signIn: () => ipcRenderer.invoke('auth:signIn') as Promise<AuthState>,
+  cancelSignIn: () => ipcRenderer.invoke('auth:cancelSignIn') as Promise<void>,
   signOut: () => ipcRenderer.invoke('auth:signOut') as Promise<AuthState>,
 
   listCases: () => ipcRenderer.invoke('cases:list') as Promise<CaseItem[]>,

@@ -1,7 +1,7 @@
 import { ipcMain, app } from 'electron'
 import { randomUUID } from 'crypto'
 import { getCases, setCases, getSettings, setSettings } from './services/store'
-import { authStatus, signIn, signOut } from './services/auth'
+import { authStatus, signIn, signOut, cancelSignIn } from './services/auth'
 import { runSync, getLastRun } from './services/sync'
 import { applyLoginItem } from './services/scheduler'
 import { checkForUpdates } from './services/updater'
@@ -24,6 +24,7 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
 
   ipcMain.handle('auth:status', () => authStatus())
   ipcMain.handle('auth:signIn', () => signIn())
+  ipcMain.handle('auth:cancelSignIn', () => cancelSignIn())
   ipcMain.handle('auth:signOut', () => signOut())
 
   ipcMain.handle('cases:list', () => getCases())

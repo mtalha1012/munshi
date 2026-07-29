@@ -30,6 +30,30 @@ export function handleAuthExpiry(): void {
   authEvents.emit('expired')
 }
 
+// Thrown to settle a sign-in that was aborted rather than failed — the user
+// cancelled it, closed the window, or started a newer attempt. The UI treats
+// this as a no-op (no error toast), unlike a real sign-in failure.
+export class SignInCancelledError extends Error {
+  constructor() {
+    super('SIGN_IN_CANCELLED')
+    this.name = 'SignInCancelledError'
+  }
+}
+
+// Teardown for the sign-in currently in flight, if any. A fresh signIn(), an
+// explicit cancelSignIn(), or the window closing to tray calls this to close the
+// abandoned loopback server and settle its pending promise. Without it, closing
+// the OAuth browser tab (which sends nothing to the server) left the promise
+// hanging for the full 5-minute timeout, wedging the UI on a disabled
+// "Opening Google…" button that survived closing and relaunching the app.
+let cancelActiveSignIn: (() => void) | null = null
+
+export function cancelSignIn(): void {
+  const cancel = cancelActiveSignIn
+  cancelActiveSignIn = null
+  cancel?.()
+}
+
 function base64url(b: Buffer): string {
   return b.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
@@ -73,11 +97,35 @@ export async function signIn(): Promise<AuthState> {
     )
   }
 
+  // Tear down any previous attempt the user abandoned (e.g. closed the browser
+  // tab): its loopback server is still open and its promise still pending. This
+  // attempt becomes the only one in flight.
+  cancelSignIn()
+
   return new Promise<AuthState>((resolve, reject) => {
-    let settled = false
     const { verifier, challenge } = makePkce()
     const expectedState = base64url(randomBytes(16))
-    const server = http.createServer(async (req, res) => {
+    let settled = false
+    let timeout: NodeJS.Timeout
+    let redirectUri = ''
+    let server: http.Server
+
+    // Settle exactly once, and always release the loopback server, the timeout,
+    // and this attempt's cancel registration.
+    const finish = (action: () => void): void => {
+      if (settled) return
+      settled = true
+      clearTimeout(timeout)
+      try {
+        server.close()
+      } catch {}
+      cancelActiveSignIn = null
+      action()
+    }
+    const cancel = (): void => finish(() => reject(new SignInCancelledError()))
+    cancelActiveSignIn = cancel
+
+    server = http.createServer(async (req, res) => {
       try {
         if (!req.url) return
         const url = new URL(req.url, 'http://127.0.0.1')
@@ -91,11 +139,9 @@ export async function signIn(): Promise<AuthState> {
         if (returnedState !== expectedState) {
           res.statusCode = 400
           res.end('Invalid state')
-          server.close()
-          if (!settled) {
-            settled = true
+          finish(() =>
             reject(new Error('Sign-in failed a security check (state mismatch). Please try again.'))
-          }
+          )
           return
         }
         const err = url.searchParams.get('error')
@@ -104,12 +150,8 @@ export async function signIn(): Promise<AuthState> {
           '<html><body style="font-family:sans-serif;padding:40px;text-align:center">' +
             '<h2>Munshi</h2><p>You can close this tab and return to the app.</p></body></html>'
         )
-        server.close()
         if (err || !code) {
-          if (!settled) {
-            settled = true
-            reject(new Error(err || 'Sign-in was cancelled.'))
-          }
+          finish(() => reject(new Error(err || 'Sign-in was cancelled.')))
           return
         }
         const client = createOAuthClient(redirectUri)
@@ -121,19 +163,13 @@ export async function signIn(): Promise<AuthState> {
           const me = await oauth2.userinfo.get()
           if (me.data.email) getStore().set('googleEmail', me.data.email)
         } catch {}
-        if (!settled) {
-          settled = true
-          resolve(authStatus())
-        }
+        finish(() => resolve(authStatus()))
       } catch (e) {
-        if (!settled) {
-          settled = true
-          reject(e as Error)
-        }
+        finish(() => reject(e as Error))
       }
     })
 
-    let redirectUri = ''
+    server.on('error', (e) => finish(() => reject(e)))
     server.listen(0, '127.0.0.1', () => {
       const addr = server.address()
       const port = typeof addr === 'object' && addr ? addr.port : 0
@@ -149,22 +185,11 @@ export async function signIn(): Promise<AuthState> {
       })
       shell.openExternal(authUrl)
     })
-    server.on('error', (e) => {
-      if (!settled) {
-        settled = true
-        reject(e)
-      }
-    })
 
-    setTimeout(() => {
-      if (!settled) {
-        settled = true
-        try {
-          server.close()
-        } catch {}
-        reject(new Error('Sign-in timed out. Please try again.'))
-      }
-    }, 5 * 60 * 1000)
+    timeout = setTimeout(
+      () => finish(() => reject(new Error('Sign-in timed out. Please try again.'))),
+      5 * 60 * 1000
+    )
   })
 }
 

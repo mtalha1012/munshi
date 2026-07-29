@@ -19,10 +19,18 @@ export function LoginScreen({ onSignedIn }: { onSignedIn: (a: AuthState) => void
         onSignedIn(state)
       }
     } catch (e) {
-      toast.error('Could not sign in', { description: (e as Error).message })
+      // A sign-in the user cancelled (or one superseded by a newer attempt or by
+      // closing the window) isn't a failure — just reset without an error toast.
+      if (!((e as Error).message || '').includes('SIGN_IN_CANCELLED')) {
+        toast.error('Could not sign in', { description: (e as Error).message })
+      }
     } finally {
       setBusy(false)
     }
+  }
+
+  const cancel = (): void => {
+    void window.api.cancelSignIn()
   }
 
   return (
@@ -45,7 +53,13 @@ export function LoginScreen({ onSignedIn }: { onSignedIn: (a: AuthState) => void
             {busy ? 'Opening Google…' : 'Sign in with Google'}
           </Button>
 
-          <p className="login-hint">Opens your browser to approve access.</p>
+          {busy ? (
+            <Button variant="ghost" size="sm" className="login-cancel" onClick={cancel}>
+              Cancel
+            </Button>
+          ) : (
+            <p className="login-hint">Opens your browser to approve access.</p>
+          )}
         </CardContent>
       </Card>
     </div>

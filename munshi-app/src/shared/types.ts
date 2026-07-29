@@ -106,6 +106,7 @@ export interface MunshiApi {
 
   authStatus(): Promise<AuthState>
   signIn(): Promise<AuthState>
+  cancelSignIn(): Promise<void>
   signOut(): Promise<AuthState>
 
   listCases(): Promise<CaseItem[]>

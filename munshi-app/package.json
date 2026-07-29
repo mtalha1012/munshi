@@ -1,6 +1,6 @@
 {
   "name": "munshi",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Munshi - keeps a lawyer's Google Calendar in sync with District Judiciary Punjab hearing dates.",
   "author": "Muhammad Talha",
   "main": "./out/main/index.js",

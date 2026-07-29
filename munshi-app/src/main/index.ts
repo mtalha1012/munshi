@@ -4,7 +4,7 @@ import { registerIpc } from './ipc'
 import { getSettings } from './services/store'
 import { applyLoginItem, startDailyScheduler } from './services/scheduler'
 import { initUpdater, checkForUpdates } from './services/updater'
-import { authEvents } from './services/auth'
+import { authEvents, cancelSignIn } from './services/auth'
 import type { SyncProgress } from '../shared/types'
 
 let mainWindow: BrowserWindow | null = null
@@ -40,6 +40,9 @@ function createWindow(): void {
   mainWindow.on('close', (e) => {
     if (!isQuiting) {
       e.preventDefault()
+      // Abort a sign-in the user left mid-flow so it doesn't stay pending in the
+      // tray and wedge the login screen when the window is shown again.
+      cancelSignIn()
       mainWindow?.hide()
     }
   })
