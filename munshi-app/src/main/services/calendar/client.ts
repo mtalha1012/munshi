@@ -74,6 +74,17 @@ export async function patchEventDates(
   await call((cal) => cal.events.patch({ calendarId, eventId, requestBody }))
 }
 
+function toUpcomingEvents(items: calendar_v3.Schema$Event[] | undefined): UpcomingEvent[] {
+  return (items || [])
+    .filter((e) => !!e.id)
+    .map((e) => ({
+      id: e.id as string,
+      title: e.summary || '(no title)',
+      date: eventDateOf(e),
+      allDay: !!e.start?.date
+    }))
+}
+
 export async function listUpcoming(calendarId: string, max = 50): Promise<UpcomingEvent[]> {
   return call(async (cal) => {
     const res = await cal.events.list({
@@ -83,14 +94,36 @@ export async function listUpcoming(calendarId: string, max = 50): Promise<Upcomi
       orderBy: 'startTime',
       maxResults: max
     })
-    return (res.data.items || [])
-      .filter((e) => !!e.id)
-      .map((e) => ({
-        id: e.id as string,
-        title: e.summary || '(no title)',
-        date: eventDateOf(e),
-        allDay: !!e.start?.date
-      }))
+    return toUpcomingEvents(res.data.items)
+  })
+}
+
+// Events that have already started, most recent first. `monthsBack` of null
+// means "all time" — no lower bound. Google orders ascending, so the newest
+// past event is last; reverse it since that's the one the user most likely
+// wants to carry forward.
+export async function listPast(
+  calendarId: string,
+  monthsBack: number | null = 6,
+  max = 50
+): Promise<UpcomingEvent[]> {
+  return call(async (cal) => {
+    const now = new Date()
+    let timeMin: string | undefined
+    if (monthsBack != null) {
+      const from = new Date(now)
+      from.setMonth(from.getMonth() - monthsBack)
+      timeMin = from.toISOString()
+    }
+    const res = await cal.events.list({
+      calendarId,
+      timeMin,
+      timeMax: now.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+      maxResults: max
+    })
+    return toUpcomingEvents(res.data.items).reverse()
   })
 }
 

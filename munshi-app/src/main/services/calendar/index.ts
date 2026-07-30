@@ -5,7 +5,7 @@ import { buildEventBody, eventDateOf, snapshotFrom } from './event-spec'
 import { applyManagedDescription } from './description'
 import * as realClient from './client'
 
-export { listUpcoming, testCalendarAccess, type UpcomingEvent } from './client'
+export { listUpcoming, listPast, testCalendarAccess, type UpcomingEvent } from './client'
 export { defaultSpec } from './event-spec'
 
 export interface CalendarPort {

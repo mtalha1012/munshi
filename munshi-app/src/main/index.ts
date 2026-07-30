@@ -3,7 +3,7 @@ import { join } from 'path'
 import { registerIpc } from './ipc'
 import { getSettings } from './services/store'
 import { applyLoginItem, startDailyScheduler } from './services/scheduler'
-import { initUpdater, checkForUpdates } from './services/updater'
+import { initUpdater, checkForUpdates, updaterEvents } from './services/updater'
 import { authEvents, cancelSignIn } from './services/auth'
 import type { SyncProgress } from '../shared/types'
 
@@ -89,6 +89,12 @@ if (!gotLock) {
     authEvents.on('expired', () => {
       BrowserWindow.getAllWindows().forEach((w) => {
         if (!w.isDestroyed()) w.webContents.send('auth:expired')
+      })
+    })
+
+    updaterEvents.on('update-downloaded', (version: string) => {
+      BrowserWindow.getAllWindows().forEach((w) => {
+        if (!w.isDestroyed()) w.webContents.send('update:downloaded', version)
       })
     })
 

@@ -27,6 +27,21 @@ function App(): JSX.Element {
     })
   }, [])
 
+  useEffect(() => {
+    return window.api.onUpdateDownloaded((version) => {
+      toast('Update ready to install', {
+        description: version
+          ? `Munshi ${version} has been downloaded.`
+          : 'A new version has been downloaded.',
+        duration: Infinity,
+        action: {
+          label: 'Restart & update',
+          onClick: () => void window.api.installUpdate()
+        }
+      })
+    })
+  }, [])
+
   if (!auth) {
     return <div className="app-loading">Loading…</div>
   }

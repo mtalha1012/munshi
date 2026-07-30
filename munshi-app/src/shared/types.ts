@@ -33,6 +33,8 @@ export interface Settings {
   calendarId: string
   runAtLogin: boolean
   lastRunDate?: string | null
+  // How far back the "Past" event picker looks. null = all time.
+  pastLookbackMonths?: number | null
 }
 
 export interface AuthState {
@@ -114,6 +116,7 @@ export interface MunshiApi {
   lookupHearing(caseNumber: string, district: string): Promise<LookupHearingResult>
   provisionCase(caseId: string): Promise<ProvisionResult>
   listUpcomingEvents(): Promise<UpcomingEvent[]>
+  listPastEvents(monthsBack: number | null): Promise<UpcomingEvent[]>
   deleteCase(id: string): Promise<CaseItem[]>
 
   getSettings(): Promise<Settings>
@@ -123,9 +126,11 @@ export interface MunshiApi {
   getLastRun(): Promise<SyncRunResult | null>
 
   checkForUpdates(): Promise<{ checking: boolean; message: string }>
+  installUpdate(): Promise<void>
 
   quit(): Promise<void>
 
   onSyncProgress(cb: (p: SyncProgress) => void): () => void
   onAuthExpired(cb: () => void): () => void
+  onUpdateDownloaded(cb: (version: string) => void): () => void
 }

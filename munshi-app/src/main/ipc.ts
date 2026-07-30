@@ -4,8 +4,8 @@ import { getCases, setCases, getSettings, setSettings } from './services/store'
 import { authStatus, signIn, signOut, cancelSignIn } from './services/auth'
 import { runSync, getLastRun } from './services/sync'
 import { applyLoginItem } from './services/scheduler'
-import { checkForUpdates } from './services/updater'
-import { ensureHearingEvent, listUpcoming, defaultSpec } from './services/calendar'
+import { checkForUpdates, quitAndInstallUpdate } from './services/updater'
+import { ensureHearingEvent, listUpcoming, listPast, defaultSpec } from './services/calendar'
 import { lookupOnce } from './services/scraper'
 import { calendarLock } from './services/mutex'
 import type { CaseItem, Settings, SyncProgress, SaveCaseInput } from '../shared/types'
@@ -132,6 +132,13 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
     return listUpcoming(getSettings().calendarId || 'primary')
   })
 
+  ipcMain.handle('calendar:listPast', async (_e, monthsBack?: number | null) => {
+    const settings = getSettings()
+    const lookback =
+      monthsBack === undefined ? (settings.pastLookbackMonths ?? 6) : monthsBack
+    return listPast(settings.calendarId || 'primary', lookback)
+  })
+
   ipcMain.handle('cases:delete', (_e, id: string) => {
     return setCases(getCases().filter((c) => c.id !== id))
   })
@@ -150,4 +157,5 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
   ipcMain.handle('sync:getLastRun', () => getLastRun())
 
   ipcMain.handle('updates:check', () => checkForUpdates())
+  ipcMain.handle('updates:install', () => quitAndInstallUpdate())
 }

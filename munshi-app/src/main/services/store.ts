@@ -15,7 +15,8 @@ const defaults: StoreSchema = {
   settings: {
     calendarId: 'primary',
     runAtLogin: true,
-    lastRunDate: null
+    lastRunDate: null,
+    pastLookbackMonths: 6
   },
   googleTokens: null,
   googleEmail: null,
@@ -74,7 +75,14 @@ export function setCases(cases: CaseItem[]): CaseItem[] {
 }
 
 export function getSettings(): Settings {
-  return getStore().get('settings')
+  const stored = getStore().get('settings')
+  // electron-store only backfills defaults for missing top-level keys, so an
+  // install that already has a settings object won't gain newly added fields.
+  return {
+    ...stored,
+    pastLookbackMonths:
+      stored.pastLookbackMonths === undefined ? 6 : stored.pastLookbackMonths
+  }
 }
 
 export function setSettings(patch: Partial<Settings>): Settings {

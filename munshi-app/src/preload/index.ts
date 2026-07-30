@@ -25,6 +25,8 @@ const api: MunshiApi = {
     ipcRenderer.invoke('cases:lookupHearing', caseNumber, district) as Promise<LookupHearingResult>,
   provisionCase: (caseId) => ipcRenderer.invoke('cases:provision', caseId) as Promise<ProvisionResult>,
   listUpcomingEvents: () => ipcRenderer.invoke('calendar:listUpcoming') as Promise<UpcomingEvent[]>,
+  listPastEvents: (monthsBack) =>
+    ipcRenderer.invoke('calendar:listPast', monthsBack) as Promise<UpcomingEvent[]>,
   deleteCase: (id) => ipcRenderer.invoke('cases:delete', id) as Promise<CaseItem[]>,
 
   getSettings: () => ipcRenderer.invoke('settings:get') as Promise<Settings>,
@@ -34,6 +36,7 @@ const api: MunshiApi = {
   getLastRun: () => ipcRenderer.invoke('sync:getLastRun') as Promise<SyncRunResult | null>,
 
   checkForUpdates: () => ipcRenderer.invoke('updates:check'),
+  installUpdate: () => ipcRenderer.invoke('updates:install') as Promise<void>,
 
   quit: () => ipcRenderer.invoke('app:quit') as Promise<void>,
 
@@ -47,6 +50,12 @@ const api: MunshiApi = {
     const listener = (): void => cb()
     ipcRenderer.on('auth:expired', listener)
     return () => ipcRenderer.removeListener('auth:expired', listener)
+  },
+
+  onUpdateDownloaded: (cb: (version: string) => void) => {
+    const listener = (_e: unknown, version: string): void => cb(version)
+    ipcRenderer.on('update:downloaded', listener)
+    return () => ipcRenderer.removeListener('update:downloaded', listener)
   }
 }
 

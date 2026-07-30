@@ -16,6 +16,7 @@ const h = vi.hoisted(() => ({
   checkForUpdates: vi.fn(),
   ensureHearingEvent: vi.fn(),
   listUpcoming: vi.fn(),
+  listPast: vi.fn(),
   lookupOnce: vi.fn()
 }))
 
@@ -50,6 +51,7 @@ vi.mock('./services/updater', () => ({ checkForUpdates: h.checkForUpdates }))
 vi.mock('./services/calendar', () => ({
   ensureHearingEvent: h.ensureHearingEvent,
   listUpcoming: h.listUpcoming,
+  listPast: h.listPast,
   defaultSpec: (title: string): CaseEventSpec => ({ title, allDay: true, reminderMins: 1440 })
 }))
 vi.mock('./services/scraper', () => ({ lookupOnce: h.lookupOnce }))
@@ -230,6 +232,32 @@ describe('cases:delete', () => {
     h.cases = [makeCase({ id: 'a' }), makeCase({ id: 'b' })]
     const result = (await call<CaseItem[]>('cases:delete', 'a'))!
     expect(result.map((c) => c.id)).toEqual(['b'])
+  })
+})
+
+describe('calendar:listPast', () => {
+  it('passes an explicitly requested lookback straight through', async () => {
+    h.settings = { calendarId: 'work@x.com', runAtLogin: true, pastLookbackMonths: 6 }
+
+    await call('calendar:listPast', 12)
+
+    expect(h.listPast).toHaveBeenCalledWith('work@x.com', 12)
+  })
+
+  it('falls back to the saved setting when no lookback is given', async () => {
+    h.settings = { calendarId: 'primary', runAtLogin: true, pastLookbackMonths: 12 }
+
+    await call('calendar:listPast')
+
+    expect(h.listPast).toHaveBeenCalledWith('primary', 12)
+  })
+
+  it('treats an explicit null as "all time" rather than falling back', async () => {
+    h.settings = { calendarId: 'primary', runAtLogin: true, pastLookbackMonths: 6 }
+
+    await call('calendar:listPast', null)
+
+    expect(h.listPast).toHaveBeenCalledWith('primary', null)
   })
 })
 
