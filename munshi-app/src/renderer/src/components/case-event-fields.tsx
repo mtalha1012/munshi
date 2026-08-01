@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,6 +27,73 @@ const TIMED_REMINDERS = [
   ...ALL_DAY_REMINDERS
 ]
 
+// How far back the "Past" picker looks. 'all' means no lower bound.
+const LOOKBACKS = [
+  { value: '6', label: 'Last 6 months' },
+  { value: '12', label: 'Last 12 months' },
+  { value: 'all', label: 'All time' }
+]
+const toMonths = (v: string): number | null => (v === 'all' ? null : parseInt(v, 10))
+
+const LOAD_ERROR = 'Could not load your events. Check your connection and try again.'
+
+// The loading / error / empty / list states shared by both event tabs.
+// Composes shadcn primitives only.
+function EventPicker({
+  id,
+  events,
+  loading,
+  error,
+  emptyText,
+  value,
+  onChange,
+  onRetry
+}: {
+  id: string
+  events: UpcomingEvent[] | null
+  loading: boolean
+  error: string | null
+  emptyText: string
+  value: string | null
+  onChange: (id: string) => void
+  onRetry: () => void
+}): JSX.Element | null {
+  if (loading) {
+    return (
+      <p className="event-loading">
+        <Loader2 className="event-loading-glyph" /> Loading your events…
+      </p>
+    )
+  }
+  if (error) {
+    return (
+      <div className="field">
+        <p className="field-help">{error}</p>
+        <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+          Try again
+        </Button>
+      </div>
+    )
+  }
+  if (!events) return null
+  if (events.length === 0) return <p className="field-help">{emptyText}</p>
+  return (
+    <Select value={value ?? ''} onValueChange={onChange}>
+      <SelectTrigger id={id}>
+        <SelectValue placeholder="Select an event" />
+      </SelectTrigger>
+      <SelectContent>
+        {events.map((e) => (
+          <SelectItem key={e.id} value={e.id}>
+            {e.title}
+            {e.date ? ` — ${e.date}` : ''}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+
 export interface CaseEventFieldsProps {
   spec: CaseEventSpec
   onSpecChange: (s: CaseEventSpec) => void
@@ -40,23 +107,55 @@ export function CaseEventFields({
   linkedEventId,
   onLinkedEventIdChange
 }: CaseEventFieldsProps): JSX.Element {
-  const [events, setEvents] = useState<UpcomingEvent[] | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [upcoming, setUpcoming] = useState<UpcomingEvent[] | null>(null)
+  const [past, setPast] = useState<UpcomingEvent[] | null>(null)
+  const [upcomingLoading, setUpcomingLoading] = useState(false)
+  const [pastLoading, setPastLoading] = useState(false)
+  const [upcomingError, setUpcomingError] = useState<string | null>(null)
+  const [pastError, setPastError] = useState<string | null>(null)
+  const [lookback, setLookback] = useState('6')
 
   const set = (patch: Partial<CaseEventSpec>): void => onSpecChange({ ...spec, ...patch })
 
-  const loadEvents = async (): Promise<void> => {
-    if (events || loading) return
-    setLoading(true)
-    setError(null)
+  // Restore the saved lookback so the Past tab opens where the user left it.
+  useEffect(() => {
+    void window.api.getSettings().then((s) => {
+      setLookback(s.pastLookbackMonths === null ? 'all' : String(s.pastLookbackMonths ?? 6))
+    })
+  }, [])
+
+  const loadUpcoming = async (force = false): Promise<void> => {
+    if ((upcoming && !force) || upcomingLoading) return
+    setUpcomingLoading(true)
+    setUpcomingError(null)
     try {
-      setEvents(await window.api.listUpcomingEvents())
+      setUpcoming(await window.api.listUpcomingEvents())
     } catch {
-      setError('Could not load your events. Check your connection and try again.')
+      setUpcomingError(LOAD_ERROR)
     } finally {
-      setLoading(false)
+      setUpcomingLoading(false)
     }
+  }
+
+  const loadPast = async (months: string, force = false): Promise<void> => {
+    if ((past && !force) || pastLoading) return
+    setPastLoading(true)
+    setPastError(null)
+    try {
+      setPast(await window.api.listPastEvents(toMonths(months)))
+    } catch {
+      setPastError(LOAD_ERROR)
+    } finally {
+      setPastLoading(false)
+    }
+  }
+
+  // A new range means a different list, so drop any selection made from the old one.
+  const changeLookback = (v: string): void => {
+    setLookback(v)
+    onLinkedEventIdChange(null)
+    void window.api.setSettings({ pastLookbackMonths: toMonths(v) })
+    void loadPast(v, true)
   }
 
   const reminders = spec.allDay ? ALL_DAY_REMINDERS : TIMED_REMINDERS
@@ -74,7 +173,8 @@ export function CaseEventFields({
       <Tabs
         defaultValue="create"
         onValueChange={(v) => {
-          if (v === 'link') void loadEvents()
+          // The link panel opens on its Upcoming tab.
+          if (v === 'link') void loadUpcoming()
           else onLinkedEventIdChange(null)
         }}
       >
@@ -161,51 +261,70 @@ export function CaseEventFields({
         </TabsContent>
 
         <TabsContent value="link" className="event-tab-panel-tight">
-          <Label htmlFor="existing">Pick an event</Label>
-          <p className="field-help">
-            Munshi will take this event over and move it to the hearing date.
-          </p>
-          {loading && (
-            <p className="event-loading">
-              <Loader2 className="event-loading-glyph" /> Loading your events…
-            </p>
-          )}
-          {error && !loading && (
-            <div className="field">
-              <p className="field-help">{error}</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setError(null)
-                  void loadEvents()
-                }}
-              >
-                Try again
-              </Button>
-            </div>
-          )}
-          {events && events.length === 0 && !loading && !error && (
-            <p className="field-help">
-              No upcoming events found. Create a new one instead.
-            </p>
-          )}
-          {events && events.length > 0 && (
-            <Select value={linkedEventId ?? ''} onValueChange={(v) => onLinkedEventIdChange(v)}>
-              <SelectTrigger id="existing">
-                <SelectValue placeholder="Select an event" />
-              </SelectTrigger>
-              <SelectContent>
-                {events.map((e) => (
-                  <SelectItem key={e.id} value={e.id}>
-                    {e.title}
-                    {e.date ? ` — ${e.date}` : ''}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+          <Tabs
+            defaultValue="upcoming"
+            onValueChange={(v) => {
+              // Each tab has its own list, so a selection can't carry across.
+              onLinkedEventIdChange(null)
+              if (v === 'upcoming') void loadUpcoming()
+              else void loadPast(lookback)
+            }}
+          >
+            <TabsList className="event-tabs-list">
+              <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="past">Past</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="upcoming" className="event-tab-panel-tight">
+              <Label htmlFor="existingUpcoming">Pick an event</Label>
+              <p className="field-help">
+                Munshi will take this event over and move it to the hearing date.
+              </p>
+              <EventPicker
+                id="existingUpcoming"
+                events={upcoming}
+                loading={upcomingLoading}
+                error={upcomingError}
+                emptyText="No upcoming events found. Try the Past tab, or create a new one."
+                value={linkedEventId}
+                onChange={onLinkedEventIdChange}
+                onRetry={() => void loadUpcoming(true)}
+              />
+            </TabsContent>
+
+            <TabsContent value="past" className="event-tab-panel-tight">
+              <Label htmlFor="existingPast">Pick an event</Label>
+              <p className="field-help">
+                Munshi leaves this event where it is and creates the next hearing from it,
+                keeping its title and reminder.
+              </p>
+              <div className="field">
+                <Label htmlFor="lookback">How far back to look</Label>
+                <Select value={lookback} onValueChange={changeLookback}>
+                  <SelectTrigger id="lookback">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LOOKBACKS.map((l) => (
+                      <SelectItem key={l.value} value={l.value}>
+                        {l.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <EventPicker
+                id="existingPast"
+                events={past}
+                loading={pastLoading}
+                error={pastError}
+                emptyText="No past events found in this period. Try a longer range."
+                value={linkedEventId}
+                onChange={onLinkedEventIdChange}
+                onRetry={() => void loadPast(lookback, true)}
+              />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>

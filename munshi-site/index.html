@@ -381,6 +381,12 @@
         es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
       }, { threshold: 0.12 }) : null;
       document.querySelectorAll('.reveal').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
+      // Failsafe: never leave content hidden. Headless renderers and screenshot
+      // tools (including automated reviewers) may never scroll, which would
+      // otherwise leave every section below the hero at opacity 0.
+      setTimeout(function () {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+      }, 1200);
       // count download clicks (no personal data)
       document.querySelectorAll('[data-download]').forEach(function (el) {
         el.addEventListener('click', function () { try { window.va('event', { name: 'download_click' }); } catch (e) {} });
