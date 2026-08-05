@@ -29,7 +29,7 @@ describe('buildEventBody', () => {
   })
   it('timed: keeps wall-clock time and duration', () => {
     const body = buildEventBody(
-      { title: 'X', allDay: false, startTime: '09:30', durationMins: 45 },
+      { title: 'X', useSiteTitle: false, allDay: false, startTime: '09:30', durationMins: 45 },
       '2026-09-07'
     )
     const s = new Date(body.start!.dateTime!)
@@ -59,17 +59,23 @@ describe('eventDateOf', () => {
 })
 
 describe('snapshotFrom', () => {
+  const prevSpec: CaseEventSpec = { title: 'x', useSiteTitle: false, allDay: true, reminderMins: null }
+
   it('round-trips an all-day event', () => {
-    const spec = snapshotFrom({
-      summary: 'Hearing',
-      start: { date: '2026-09-07' },
-      end: { date: '2026-09-08' },
-      description: 'notes',
-      location: 'Court 4',
-      reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 1440 }] }
-    })
+    const spec = snapshotFrom(
+      {
+        summary: 'Hearing',
+        start: { date: '2026-09-07' },
+        end: { date: '2026-09-08' },
+        description: 'notes',
+        location: 'Court 4',
+        reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 1440 }] }
+      },
+      prevSpec
+    )
     expect(spec).toEqual({
       title: 'Hearing',
+      useSiteTitle: false,
       allDay: true,
       description: 'notes',
       location: 'Court 4',
@@ -79,21 +85,28 @@ describe('snapshotFrom', () => {
   it('round-trips a timed event', () => {
     const start = new Date(2026, 8, 7, 9, 30, 0)
     const end = new Date(2026, 8, 7, 10, 15, 0)
-    const spec = snapshotFrom({
-      summary: 'Hearing',
-      start: { dateTime: start.toISOString() },
-      end: { dateTime: end.toISOString() }
-    })
+    const spec = snapshotFrom(
+      {
+        summary: 'Hearing',
+        start: { dateTime: start.toISOString() },
+        end: { dateTime: end.toISOString() }
+      },
+      prevSpec
+    )
     expect(spec.allDay).toBe(false)
     expect(spec.startTime).toBe('09:30')
     expect(spec.durationMins).toBe(45)
+    expect(spec.useSiteTitle).toBe(false)
   })
   it('captures a user edit to the title (this is how edits propagate)', () => {
-    const spec = snapshotFrom({ summary: 'Renamed by user', start: { date: '2026-09-07' } })
+    const spec = snapshotFrom({ summary: 'Renamed by user', start: { date: '2026-09-07' } }, prevSpec)
     expect(spec.title).toBe('Renamed by user')
   })
   it('useDefault reminders snapshot back to null', () => {
-    const spec = snapshotFrom({ summary: 'X', start: { date: '2026-09-07' }, reminders: { useDefault: true } })
+    const spec = snapshotFrom(
+      { summary: 'X', start: { date: '2026-09-07' }, reminders: { useDefault: true } },
+      prevSpec
+    )
     expect(spec.reminderMins).toBeNull()
   })
 })

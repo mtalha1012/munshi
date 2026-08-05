@@ -58,7 +58,7 @@ export async function ensureHearingEvent(args: EnsureArgs): Promise<EnsureResult
     ? await port.getEvent(args.calendarId, args.trackedEventId)
     : null
 
-  const spec = existing ? snapshotFrom(existing) : args.spec
+  const spec = existing ? snapshotFrom(existing, args.spec) : args.spec
 
   const nextDescription = applyManagedDescription(
     spec.description,

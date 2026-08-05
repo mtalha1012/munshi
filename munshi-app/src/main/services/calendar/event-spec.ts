@@ -49,11 +49,12 @@ function reminderFrom(ev: calendar_v3.Schema$Event): number | null {
   return typeof first?.minutes === 'number' ? first.minutes : null
 }
 
-// Stored so a deleted event can be rebuilt.
-export function snapshotFrom(ev: calendar_v3.Schema$Event): CaseEventSpec {
+// Stored so a deleted event can be rebuilt. Inherits useSiteTitle from the previous spec.
+export function snapshotFrom(ev: calendar_v3.Schema$Event, previous: CaseEventSpec): CaseEventSpec {
   const allDay = !!ev.start?.date
   const spec: CaseEventSpec = {
     title: ev.summary || '',
+    useSiteTitle: previous.useSiteTitle,
     allDay,
     reminderMins: reminderFrom(ev)
   }
