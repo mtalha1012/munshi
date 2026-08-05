@@ -9,6 +9,7 @@ export interface LookupResult {
   allDates: string[]
   stage?: string
   judge?: string
+  title?: string
   error?: string
   diagnostics?: Record<string, unknown>
 }
@@ -19,6 +20,7 @@ interface ListRow {
   href: string
   stage: string
   judge: string
+  title: string
 }
 
 // Site uses dd-mm-yyyy.
@@ -96,6 +98,7 @@ const parseListScript = `(function(){
     var caseIdx=idxOf(hs,['case no']);
     var stageIdx=idxOf(hs,['stage']);
     var judgeIdx=idxOf(hs,['judge']);
+    var titleIdx=idxOf(hs,['case title','title']);
     var rows=[].slice.call(t.querySelectorAll('tbody tr')), out=[];
     for(var r=0;r<rows.length;r++){
       var tds=[].slice.call(rows[r].querySelectorAll('td'));
@@ -106,7 +109,8 @@ const parseListScript = `(function(){
         dateText: (tds[dateIdx].textContent||'').trim(),
         href: link ? link.href : '',
         stage: stageIdx>=0 ? text(tds[stageIdx]) : '',
-        judge: judgeIdx>=0 ? judgeName(tds[judgeIdx]) : ''
+        judge: judgeIdx>=0 ? judgeName(tds[judgeIdx]) : '',
+        title: (titleIdx>=0 && tds[titleIdx]) ? text(tds[titleIdx]) : ''
       });
     }
     if(out.length) return {found:true, rows:out};
@@ -252,7 +256,8 @@ export class ScraperSession {
             nextHearing: picked,
             allDates: Array.from(new Set(allDates)),
             stage: chosen.stage || undefined,
-            judge: chosen.judge || undefined
+            judge: chosen.judge || undefined,
+            title: chosen.title || undefined
           }
         }
         if (chosen.href) {
