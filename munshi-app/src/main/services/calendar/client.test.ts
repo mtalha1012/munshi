@@ -23,17 +23,15 @@ vi.mock('../auth', () => ({
   AuthExpiredError
 }))
 
-vi.mock('googleapis', () => ({
-  google: {
-    calendar: () => ({
-      events: {
-        list: (params: Record<string, unknown>) => {
-          listParams = params
-          return eventsList()
-        }
+vi.mock('@googleapis/calendar', () => ({
+  calendar: () => ({
+    events: {
+      list: (params: Record<string, unknown>) => {
+        listParams = params
+        return eventsList()
       }
-    })
-  }
+    }
+  })
 }))
 
 import { listUpcoming, listPast } from './client'

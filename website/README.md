@@ -18,9 +18,9 @@ robots.txt / sitemap.xml
 
 ## Deploy to Vercel
 
-1. Put this `munshi-site/` folder in a Git repo (its own repo is simplest).
+1. Put this `website/` folder in a Git repo (its own repo is simplest).
 2. Vercel → **Add New → Project**, import the repo. If it's in a subfolder, set
-   **Root Directory** to `munshi-site`. Framework preset: **Other**. No build
+   **Root Directory** to `website`. Framework preset: **Other**. No build
    command.
 3. Deploy, open the `*.vercel.app` URL, confirm it loads.
 4. **Settings → Domains** → add `munshi.mtalhasajid.dev`. Add the CNAME Vercel

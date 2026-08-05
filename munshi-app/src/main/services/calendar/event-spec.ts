@@ -1,4 +1,4 @@
-import type { calendar_v3 } from 'googleapis'
+import type { calendar_v3 } from '@googleapis/calendar'
 import type { CaseEventSpec } from '../../../shared/types'
 
 const DEFAULT_REMINDER_MINS = 1440

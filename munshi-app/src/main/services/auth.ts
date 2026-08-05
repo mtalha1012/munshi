@@ -3,9 +3,7 @@ import { URL } from 'url'
 import { EventEmitter } from 'events'
 import { randomBytes, createHash } from 'crypto'
 import { shell } from 'electron'
-import { google } from 'googleapis'
-import { CodeChallengeMethod } from 'google-auth-library'
-import type { OAuth2Client } from 'google-auth-library'
+import { CodeChallengeMethod, OAuth2Client } from 'google-auth-library'
 import { getStore } from './store'
 import { getOAuthConfig, isOAuthConfigured, GOOGLE_SCOPES } from '../oauth-config'
 import type { AuthState } from '../../shared/types'
@@ -75,7 +73,7 @@ export function authStatus(): AuthState {
 
 function createOAuthClient(redirectUri?: string): OAuth2Client {
   const { clientId, clientSecret } = getOAuthConfig()
-  return new google.auth.OAuth2(clientId, clientSecret, redirectUri)
+  return new OAuth2Client(clientId, clientSecret, redirectUri)
 }
 
 export async function getAuthedClient(): Promise<OAuth2Client> {
@@ -159,8 +157,12 @@ export async function signIn(): Promise<AuthState> {
         getStore().set('googleTokens', tokens)
         client.setCredentials(tokens)
         try {
-          const oauth2 = google.oauth2({ version: 'v2', auth: client })
-          const me = await oauth2.userinfo.get()
+          // Plain REST call rather than the `googleapis` umbrella package: that
+          // dependency ships every Google API and alone made the installer too
+          // large for makensis to build.
+          const me = await client.request<{ email?: string }>({
+            url: 'https://www.googleapis.com/oauth2/v2/userinfo'
+          })
           if (me.data.email) getStore().set('googleEmail', me.data.email)
         } catch {}
         finish(() => resolve(authStatus()))

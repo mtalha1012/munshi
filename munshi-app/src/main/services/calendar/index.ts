@@ -1,4 +1,4 @@
-import type { calendar_v3 } from 'googleapis'
+import type { calendar_v3 } from '@googleapis/calendar'
 import type { CaseEventSpec } from '../../../shared/types'
 import { decideAction } from './decide'
 import { buildEventBody, eventDateOf, snapshotFrom } from './event-spec'

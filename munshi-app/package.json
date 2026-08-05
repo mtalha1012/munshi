@@ -8,17 +8,17 @@
     "dev": "electron-vite dev",
     "start": "electron-vite preview",
     "build": "electron-vite build",
-    "build:win": "electron-vite build && electron-builder --win --publish never",
-    "build:win:publish": "node scripts/publish.mjs",
+    "build:win": "node scripts/build.mjs",
+    "build:win:publish": "node scripts/build.mjs --publish",
     "postinstall": "electron-builder install-app-deps",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@googleapis/calendar": "^16.0.0",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.2.1",
-    "google-auth-library": "^9.15.1",
-    "googleapis": "^140.0.1"
+    "google-auth-library": "^9.15.1"
   },
   "devDependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.1",

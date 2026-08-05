@@ -25,6 +25,13 @@ files:
 asarUnpack:
   - resources/**
 
+# Ship only the English Chromium locale. The full set is ~39 MB of .pak files
+# the UI never uses, and installer size is a hard constraint here: makensis.exe
+# is 32-bit and fails with "error creating mmap" once the compressed payload
+# gets large. Keep this list minimal.
+electronLanguages:
+  - en-US
+
 win:
   target:
     - target: nsis

@@ -17,15 +17,11 @@ vi.mock('../oauth-config', () => ({
   isOAuthConfigured: () => true,
   GOOGLE_SCOPES: ['openid', 'email']
 }))
-vi.mock('google-auth-library', () => ({ CodeChallengeMethod: { S256: 'S256' } }))
-vi.mock('googleapis', () => ({
-  google: {
-    auth: {
-      OAuth2: class {
-        generateAuthUrl(): string {
-          return 'https://accounts.google.com/o/oauth2/v2/auth?mock=1'
-        }
-      }
+vi.mock('google-auth-library', () => ({
+  CodeChallengeMethod: { S256: 'S256' },
+  OAuth2Client: class {
+    generateAuthUrl(): string {
+      return 'https://accounts.google.com/o/oauth2/v2/auth?mock=1'
     }
   }
 }))

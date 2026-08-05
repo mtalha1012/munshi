@@ -1,4 +1,4 @@
-import { google, calendar_v3 } from 'googleapis'
+import { calendar as calendarApi, calendar_v3 } from '@googleapis/calendar'
 import { getAuthedClient, handleAuthExpiry, AuthExpiredError } from '../auth'
 import { buildEventBody, eventDateOf } from './event-spec'
 import { isGoneError, isAuthError } from './errors'
@@ -13,7 +13,11 @@ export interface UpcomingEvent {
 
 async function api(): Promise<calendar_v3.Calendar> {
   const auth = await getAuthedClient()
-  return google.calendar({ version: 'v3', auth })
+  // @googleapis/calendar nests its own google-auth-library copy, so its
+  // OAuth2Client is a structurally identical but nominally distinct type from
+  // the one auth.ts constructs. The cast bridges the two declarations; the
+  // client it receives is a real OAuth2Client.
+  return calendarApi({ version: 'v3', auth: auth as unknown as string })
 }
 
 // Runs a calendar operation and converts a dead-session failure (expired/revoked
