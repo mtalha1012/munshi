@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { addDaysIso, eventDateOf, snapshotFrom, buildEventBody, defaultSpec } from './event-spec'
+import { addDaysIso, eventDateOf, snapshotFrom, buildEventBody, defaultSpec, resolveEventSpec } from './event-spec'
+import type { CaseEventSpec } from '../../../shared/types'
 
 describe('addDaysIso', () => {
   it('adds a day without a timezone roll-back', () => {
@@ -13,17 +14,17 @@ describe('addDaysIso', () => {
 
 describe('buildEventBody', () => {
   it('all-day: end date is exclusive (start + 1)', () => {
-    const body = buildEventBody(defaultSpec('Party A vs Party B'), '2026-09-07')
+    const body = buildEventBody({ title: 'Party A vs Party B', useSiteTitle: true, allDay: true, reminderMins: 1440 }, '2026-09-07')
     expect(body.start?.date).toBe('2026-09-07')
     expect(body.end?.date).toBe('2026-09-08')
     expect(body.summary).toBe('Party A vs Party B')
   })
   it('all-day default carries a 1-day-before reminder', () => {
-    const body = buildEventBody(defaultSpec('X'), '2026-09-07')
+    const body = buildEventBody({ title: 'X', useSiteTitle: true, allDay: true, reminderMins: 1440 }, '2026-09-07')
     expect(body.reminders).toEqual({ useDefault: false, overrides: [{ method: 'popup', minutes: 1440 }] })
   })
   it('null reminder means use the calendar default', () => {
-    const body = buildEventBody({ title: 'X', allDay: true, reminderMins: null }, '2026-09-07')
+    const body = buildEventBody({ title: 'X', useSiteTitle: true, allDay: true, reminderMins: null }, '2026-09-07')
     expect(body.reminders).toEqual({ useDefault: true })
   })
   it('timed: keeps wall-clock time and duration', () => {
@@ -94,5 +95,54 @@ describe('snapshotFrom', () => {
   it('useDefault reminders snapshot back to null', () => {
     const spec = snapshotFrom({ summary: 'X', start: { date: '2026-09-07' }, reminders: { useDefault: true } })
     expect(spec.reminderMins).toBeNull()
+  })
+})
+
+describe('resolveEventSpec', () => {
+  const base: CaseEventSpec = {
+    title: 'My Custom Title',
+    useSiteTitle: false,
+    allDay: true,
+    reminderMins: 1440
+  }
+
+  it('uses the custom title when useSiteTitle is false', () => {
+    const out = resolveEventSpec(base, 'Site Title', '100200300')
+    expect(out.title).toBe('My Custom Title')
+    expect(out).not.toBe(base)
+  })
+
+  it('falls back to case number when custom title is blank', () => {
+    const out = resolveEventSpec({ ...base, title: '   ' }, 'Site Title', '100200300')
+    expect(out.title).toBe('100200300')
+  })
+
+  it('uses the site title when useSiteTitle is true and titleFromSite is set', () => {
+    const out = resolveEventSpec(
+      { ...base, useSiteTitle: true, title: 'stale custom' },
+      'Doctor Dina khan VS Shoukat Babar',
+      '100200300'
+    )
+    expect(out.title).toBe('Doctor Dina khan VS Shoukat Babar')
+  })
+
+  it('falls back to case number when useSiteTitle is true but titleFromSite is missing', () => {
+    const out = resolveEventSpec(
+      { ...base, useSiteTitle: true, title: '' },
+      null,
+      '100200300'
+    )
+    expect(out.title).toBe('100200300')
+  })
+})
+
+describe('defaultSpec', () => {
+  it('defaults new cases to useSiteTitle=true and an empty custom title', () => {
+    expect(defaultSpec()).toEqual({
+      title: '',
+      useSiteTitle: true,
+      allDay: true,
+      reminderMins: 1440
+    })
   })
 })

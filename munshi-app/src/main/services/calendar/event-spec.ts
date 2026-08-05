@@ -16,8 +16,21 @@ export function addDaysIso(dateStr: string, days: number): string {
   return dt.toISOString().slice(0, 10)
 }
 
-export function defaultSpec(title: string): CaseEventSpec {
-  return { title, allDay: true, reminderMins: DEFAULT_REMINDER_MINS }
+export function defaultSpec(): CaseEventSpec {
+  return { title: '', useSiteTitle: true, allDay: true, reminderMins: DEFAULT_REMINDER_MINS }
+}
+
+// Returns a shallow-cloned spec whose title is the effective calendar title.
+// Never mutates the input.
+export function resolveEventSpec(
+  spec: CaseEventSpec,
+  titleFromSite: string | null,
+  caseNumber: string
+): CaseEventSpec {
+  const chosen = spec.useSiteTitle
+    ? titleFromSite?.trim() || caseNumber
+    : spec.title.trim() || caseNumber
+  return { ...spec, title: chosen }
 }
 
 export function eventDateOf(ev: calendar_v3.Schema$Event): string | null {

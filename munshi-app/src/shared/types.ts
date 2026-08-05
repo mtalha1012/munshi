@@ -1,9 +1,9 @@
 export interface CaseEventSpec {
   title: string
+  useSiteTitle: boolean
   allDay: boolean
   startTime?: string
   durationMins?: number
-  // Minutes before start; Google accepts 0..40320.
   reminderMins?: number | null
   description?: string
   location?: string
@@ -13,7 +13,7 @@ export interface CaseItem {
   id: string
   caseNumber: string
   district: string
-  name: string
+  titleFromSite: string | null
   enabled: boolean
 
   event: CaseEventSpec
@@ -82,7 +82,6 @@ export interface SaveCaseInput {
   id?: string
   caseNumber: string
   district: string
-  name: string
   enabled?: boolean
   event: CaseEventSpec
   trackedEventId?: string | null
