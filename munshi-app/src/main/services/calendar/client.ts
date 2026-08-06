@@ -64,17 +64,19 @@ export async function insertEvent(
   })
 }
 
-// Patches start/end (and description only when asked) so other edits survive.
+// Patches start/end (and description/summary only when asked) so other edits survive.
 export async function patchEventDates(
   calendarId: string,
   eventId: string,
   spec: CaseEventSpec,
   dateStr: string,
-  withDescription = false
+  withDescription = false,
+  withSummary = false
 ): Promise<void> {
   const body = buildEventBody(spec, dateStr)
   const requestBody: calendar_v3.Schema$Event = { start: body.start, end: body.end }
   if (withDescription) requestBody.description = body.description ?? ''
+  if (withSummary) requestBody.summary = body.summary ?? ''
   await call((cal) => cal.events.patch({ calendarId, eventId, requestBody }))
 }
 

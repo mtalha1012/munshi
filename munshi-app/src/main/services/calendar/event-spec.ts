@@ -50,10 +50,14 @@ function reminderFrom(ev: calendar_v3.Schema$Event): number | null {
 }
 
 // Stored so a deleted event can be rebuilt. Inherits useSiteTitle from the previous spec.
+// When useSiteTitle is true, `previous.title` already holds the resolved site title
+// (set by resolveEventSpec before this call) — prefer it over the stale Google summary
+// so the toggle's promise reaches Google on move/noop, not just on brand-new inserts.
+// When useSiteTitle is false, the user's Google-side edits stay authoritative.
 export function snapshotFrom(ev: calendar_v3.Schema$Event, previous: CaseEventSpec): CaseEventSpec {
   const allDay = !!ev.start?.date
   const spec: CaseEventSpec = {
-    title: ev.summary || '',
+    title: previous.useSiteTitle ? (previous.title || ev.summary || '') : (ev.summary || ''),
     useSiteTitle: previous.useSiteTitle,
     allDay,
     reminderMins: reminderFrom(ev)

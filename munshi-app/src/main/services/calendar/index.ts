@@ -19,7 +19,8 @@ export interface CalendarPort {
     eventId: string,
     spec: CaseEventSpec,
     dateStr: string,
-    withDescription?: boolean
+    withDescription?: boolean,
+    withSummary?: boolean
   ): Promise<void>
 }
 
@@ -67,6 +68,7 @@ export async function ensureHearingEvent(args: EnsureArgs): Promise<EnsureResult
   )
   const descChanged = nextDescription !== (spec.description ?? '')
   const outSpec: CaseEventSpec = { ...spec, description: nextDescription || undefined }
+  const summaryChanged = outSpec.title !== (existing?.summary ?? '')
 
   const action = decideAction({
     trackedEventId: args.trackedEventId,
@@ -78,13 +80,14 @@ export async function ensureHearingEvent(args: EnsureArgs): Promise<EnsureResult
 
   switch (action.kind) {
     case 'noop': {
-      if (descChanged) {
+      if (descChanged || summaryChanged) {
         await port.patchEventDates(
           args.calendarId,
           args.trackedEventId as string,
           outSpec,
           args.hearingDate,
-          true
+          descChanged,
+          summaryChanged
         )
       }
       return {
@@ -102,7 +105,8 @@ export async function ensureHearingEvent(args: EnsureArgs): Promise<EnsureResult
         args.trackedEventId as string,
         outSpec,
         args.hearingDate,
-        descChanged
+        descChanged,
+        summaryChanged
       )
       return {
         status: 'moved',

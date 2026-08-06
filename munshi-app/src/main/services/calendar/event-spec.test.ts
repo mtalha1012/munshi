@@ -109,6 +109,18 @@ describe('snapshotFrom', () => {
     )
     expect(spec.reminderMins).toBeNull()
   })
+
+  it('prefers the resolved title over the stale Google summary when useSiteTitle is true', () => {
+    const siteSpec: CaseEventSpec = {
+      title: 'Resolved',
+      useSiteTitle: true,
+      allDay: true,
+      reminderMins: null
+    }
+    const spec = snapshotFrom({ summary: 'Old', start: { date: '2026-09-07' } }, siteSpec)
+    expect(spec.title).toBe('Resolved')
+    expect(spec.useSiteTitle).toBe(true)
+  })
 })
 
 describe('resolveEventSpec', () => {

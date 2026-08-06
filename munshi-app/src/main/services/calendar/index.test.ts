@@ -155,3 +155,57 @@ describe('ensureHearingEvent — stage/judge', () => {
     expect(port.patchEventDates).not.toHaveBeenCalled()
   })
 })
+
+describe('ensureHearingEvent — title propagation to Google (useSiteTitle)', () => {
+  it('useSiteTitle=true, existing event, site title changed: patches summary on noop', async () => {
+    const port = makePort({
+      getEvent: vi.fn(async () => ({ id: 'evt1', summary: 'Old Title', start: { date: '2026-09-07' } }))
+    })
+    // Mirrors what sync.ts/ipc.ts pass: args.spec.title already holds the
+    // resolved effective title (via resolveEventSpec) when useSiteTitle is true.
+    const siteSpec: CaseEventSpec = {
+      title: 'New Site Title', useSiteTitle: true, allDay: true, reminderMins: 1440
+    }
+    const r = await ensureHearingEvent({
+      calendarId: 'primary', trackedEventId: 'evt1', spec: siteSpec,
+      hearingDate: '2026-09-07', today: '2026-07-15', port
+    })
+    expect(r.status).toBe('noop')
+    expect(port.patchEventDates).toHaveBeenCalledOnce()
+    const call = (port.patchEventDates as ReturnType<typeof vi.fn>).mock.calls[0]
+    const [, , patchedSpec, , , withSummary] = call
+    expect(withSummary).toBe(true)
+    expect((patchedSpec as CaseEventSpec).title).toBe('New Site Title')
+  })
+
+  it('useSiteTitle=true, existing event, site title unchanged: no patch', async () => {
+    const port = makePort({
+      getEvent: vi.fn(async () => ({ id: 'evt1', summary: 'Same Title', start: { date: '2026-09-07' } }))
+    })
+    const siteSpec: CaseEventSpec = {
+      title: 'Same Title', useSiteTitle: true, allDay: true, reminderMins: 1440
+    }
+    const r = await ensureHearingEvent({
+      calendarId: 'primary', trackedEventId: 'evt1', spec: siteSpec,
+      hearingDate: '2026-09-07', today: '2026-07-15', port
+    })
+    expect(r.status).toBe('noop')
+    expect(port.patchEventDates).not.toHaveBeenCalled()
+  })
+
+  it('useSiteTitle=false, existing event with a user-edited Google summary: Google wins, no patch', async () => {
+    const port = makePort({
+      getEvent: vi.fn(async () => ({ id: 'evt1', summary: 'OtherTitle', start: { date: '2026-09-07' } }))
+    })
+    const customSpec: CaseEventSpec = {
+      title: 'MyTitle', useSiteTitle: false, allDay: true, reminderMins: 1440
+    }
+    const r = await ensureHearingEvent({
+      calendarId: 'primary', trackedEventId: 'evt1', spec: customSpec,
+      hearingDate: '2026-09-07', today: '2026-07-15', port
+    })
+    expect(r.status).toBe('noop')
+    expect(r.spec.title).toBe('OtherTitle')
+    expect(port.patchEventDates).not.toHaveBeenCalled()
+  })
+})
