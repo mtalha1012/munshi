@@ -1,6 +1,5 @@
 import Store from 'electron-store'
 import type { CaseItem, CaseEventSpec, Settings } from '../../shared/types'
-import { defaultSpec } from './calendar/event-spec'
 
 interface StoreSchema {
   cases: CaseItem[]
@@ -37,22 +36,44 @@ interface LegacyCase {
   title?: string
   calendarKeyword?: string
   name?: string
-  event?: CaseEventSpec
+  titleFromSite?: string | null
+  event?: Partial<CaseEventSpec>
   trackedEventId?: string | null
   trackedHearingDate?: string | null
   trackStage?: boolean
   trackJudges?: boolean
 }
 
-function migrate(raw: CaseItem & LegacyCase): CaseItem {
-  const name = raw.name || raw.title || raw.caseNumber
+function migrateEvent(
+  raw: Partial<CaseEventSpec> | undefined,
+  legacyName: string
+): CaseEventSpec {
+  if (!raw) {
+    // Genuinely blank case: default to useSiteTitle=true.
+    return { title: '', useSiteTitle: true, allDay: true, reminderMins: 1440 }
+  }
   return {
+    title: raw.title || legacyName || '',
+    // Existing cases with no flag = opt-out (preserves upgrade behavior).
+    useSiteTitle: raw.useSiteTitle ?? false,
+    allDay: raw.allDay ?? true,
+    startTime: raw.startTime,
+    durationMins: raw.durationMins,
+    reminderMins: raw.reminderMins ?? 1440,
+    description: raw.description,
+    location: raw.location
+  }
+}
+
+function migrate(raw: CaseItem & LegacyCase): CaseItem {
+  const legacyName = raw.name || raw.title || ''
+  const item: CaseItem = {
     id: raw.id,
     caseNumber: raw.caseNumber,
     district: raw.district,
-    name,
+    titleFromSite: raw.titleFromSite ?? null,
     enabled: raw.enabled ?? true,
-    event: raw.event ?? defaultSpec(name),
+    event: migrateEvent(raw.event, legacyName),
     trackedEventId: raw.trackedEventId ?? null,
     trackedHearingDate: raw.trackedHearingDate ?? null,
     lastKnownHearing: raw.lastKnownHearing ?? null,
@@ -62,6 +83,7 @@ function migrate(raw: CaseItem & LegacyCase): CaseItem {
     trackStage: raw.trackStage ?? false,
     trackJudges: raw.trackJudges ?? false
   }
+  return item
 }
 
 export function getCases(): CaseItem[] {
