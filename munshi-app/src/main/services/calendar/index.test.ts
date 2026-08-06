@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { ensureHearingEvent, type CalendarPort } from './index'
 import type { CaseEventSpec } from '../../../shared/types'
 
-const spec: CaseEventSpec = { title: 'Party A vs Party B', allDay: true, reminderMins: 1440 }
+const spec: CaseEventSpec = { title: 'Party A vs Party B', useSiteTitle: false, allDay: true, reminderMins: 1440 }
 
 function makePort(over: Partial<CalendarPort> = {}): CalendarPort {
   return {
