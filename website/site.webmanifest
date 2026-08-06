@@ -1,0 +1,17 @@
+{
+  "name": "Munshi — court hearing dates on your Google Calendar",
+  "short_name": "Munshi",
+  "description": "A free Windows app that keeps a lawyer's Google Calendar in step with court hearing dates from the District Judiciary Punjab.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "lang": "en",
+  "background_color": "#15191d",
+  "theme_color": "#15191d",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

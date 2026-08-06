@@ -1,4 +1,12 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  Menu,
+  Tray,
+  nativeImage
+} from 'electron'
 import { join } from 'path'
 import { registerIpc } from './ipc'
 import { getSettings } from './services/store'
@@ -8,6 +16,7 @@ import { authEvents, cancelSignIn } from './services/auth'
 import type { SyncProgress } from '../shared/types'
 
 let mainWindow: BrowserWindow | null = null
+let tray: Tray | null = null
 let isQuiting = false
 
 const APP_ICON = join(__dirname, '../../resources/icon.png')
@@ -53,10 +62,28 @@ function createWindow(): void {
   })
 
   const rendererUrl = process.env['ELECTRON_RENDERER_URL']
+  console.log('[munshi] createWindow, rendererUrl=', rendererUrl)
   if (rendererUrl) {
     mainWindow.loadURL(rendererUrl)
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+  // Force DevTools open in dev mode. Docked bottom so it's visible even if
+  // detach fails silently on this platform.
+  if (rendererUrl || !app.isPackaged) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      mainWindow?.webContents.openDevTools({ mode: 'bottom' })
+      console.log('[munshi] devtools requested')
+    })
+    mainWindow.webContents.on('render-process-gone', (_e, details) => {
+      console.log('[munshi] renderer crashed:', details)
+    })
+    mainWindow.webContents.on(
+      'console-message',
+      (_e, level, message, line, sourceId) => {
+        console.log(`[renderer:${level}] ${message} (${sourceId}:${line})`)
+      }
+    )
   }
 }
 
@@ -71,6 +98,30 @@ function showMainWindow(): void {
   mainWindow.focus()
 }
 
+function quitApp(): void {
+  isQuiting = true
+  app.quit()
+}
+
+function createTray(): void {
+  // Closing the window only hides it (see the 'close' handler above) so the
+  // daily scheduler keeps running. Without a tray icon the app would be
+  // invisible-but-alive, with no way to reopen or quit it.
+  const image = nativeImage
+    .createFromPath(APP_ICON)
+    .resize({ width: 16, height: 16 })
+  tray = new Tray(image)
+  tray.setToolTip('Munshi')
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      { label: 'Open Munshi', click: () => showMainWindow() },
+      { type: 'separator' },
+      { label: 'Quit Munshi', click: () => quitApp() }
+    ])
+  )
+  tray.on('double-click', () => showMainWindow())
+}
+
 const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) {
   app.quit()
@@ -79,6 +130,7 @@ if (!gotLock) {
 
   app.whenReady().then(() => {
     createWindow()
+    createTray()
 
     const broadcast = (p: SyncProgress): void => {
       BrowserWindow.getAllWindows().forEach((w) => {
@@ -99,10 +151,7 @@ if (!gotLock) {
     })
 
     registerIpc(broadcast)
-    ipcMain.handle('app:quit', () => {
-      isQuiting = true
-      app.quit()
-    })
+    ipcMain.handle('app:quit', () => quitApp())
 
     applyLoginItem(getSettings().runAtLogin)
     startDailyScheduler(broadcast)
@@ -118,6 +167,10 @@ if (!gotLock) {
 
 app.on('before-quit', () => {
   isQuiting = true
+  // Release the icon explicitly; otherwise Windows can leave a ghost in the
+  // notification area until the user hovers over it.
+  tray?.destroy()
+  tray = null
 })
 
 app.on('window-all-closed', () => {})

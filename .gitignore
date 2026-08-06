@@ -2,3 +2,4 @@ node_modules/
 munshi-app/out/
 munshi-app/release/
 .env
+.idea

@@ -16,6 +16,10 @@ function todayIso(): string {
 export function applyLoginItem(runAtLogin: boolean): void {
   app.setLoginItemSettings({
     openAtLogin: runAtLogin,
+    // Fixed registry value name under HKCU\...\CurrentVersion\Run. Without this
+    // Electron derives it from the AppUserModelID, which the NSIS uninstaller
+    // cannot predict — see build/installer.nsh, which deletes "Munshi".
+    name: 'Munshi',
     args: ['--hidden']
   })
 }

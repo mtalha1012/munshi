@@ -40,6 +40,9 @@ win:
   icon: build/icon.ico
 
 nsis:
+  # Kills the running background process and clears the run-at-login registry
+  # entry on uninstall — see the comments in that file.
+  include: build/installer.nsh
   oneClick: false                 # show the assisted install wizard
   perMachine: false               # install for the current user (no admin needed)
   allowToChangeInstallationDirectory: true   # keep the folder-choice page

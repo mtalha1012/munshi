@@ -6,23 +6,34 @@
   <title>Munshi: Court hearing dates on your Google Calendar, automatically</title>
   <meta name="description" content="Munshi is a free Windows app that keeps a lawyer's Google Calendar in step with court hearing dates from the District Judiciary Punjab. Add a case once and it tracks every hearing for you." />
   <link rel="canonical" href="https://munshi.mtalhasajid.dev/" />
-  <meta name="robots" content="index, follow" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="theme-color" content="#15191d" />
+  <meta name="author" content="Muhammad Talha" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Munshi" />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:title" content="Munshi · Never miss a hearing" />
   <meta property="og:description" content="A free Windows app that syncs court hearing dates from the District Judiciary Punjab straight to a lawyer's Google Calendar." />
   <meta property="og:url" content="https://munshi.mtalhasajid.dev/" />
-  <meta property="og:image" content="https://munshi.mtalhasajid.dev/og.svg" />
+  <meta property="og:image" content="https://munshi.mtalhasajid.dev/og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Munshi — court hearing dates on your Google Calendar, automatically." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Munshi · Never miss a hearing" />
-  <meta name="twitter:image" content="https://munshi.mtalhasajid.dev/og.svg" />
+  <meta name="twitter:description" content="A free Windows app that syncs court hearing dates from the District Judiciary Punjab straight to a lawyer's Google Calendar." />
+  <meta name="twitter:image" content="https://munshi.mtalhasajid.dev/og.png" />
+  <meta name="twitter:image:alt" content="Munshi — court hearing dates on your Google Calendar, automatically." />
 
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="32x32" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="preload" href="fonts/alata-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/mada-400.woff2" as="font" type="font/woff2" crossorigin />
-  <script>document.documentElement.className += ' js';</script>
+  <link rel="preload" href="images/hero.jpg" as="image" fetchpriority="high" />
   <script>document.documentElement.classList.add('js')</script>
   <link rel="stylesheet" href="styles.css" />
 
@@ -36,8 +47,27 @@
     "url": "https://munshi.mtalhasajid.dev/",
     "downloadUrl": "https://github.com/mtalha1012/munshi/releases/latest/download/Munshi-Setup.exe",
     "description": "Munshi is a free Windows desktop app that keeps a lawyer's Google Calendar in step with court hearing dates from the District Judiciary Punjab case-search website.",
+    "image": "https://munshi.mtalhasajid.dev/og.png",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "featureList": [
+      "Checks the District Judiciary Punjab case-search site daily",
+      "Creates and moves Google Calendar events for each hearing",
+      "Follows adjournments and rebuilds deleted events",
+      "Runs entirely on your own computer, with no Munshi server"
+    ],
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "Muhammad Talha", "url": "https://mtalhasajid.dev" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Munshi",
+    "url": "https://munshi.mtalhasajid.dev/",
+    "inLanguage": "en",
+    "publisher": { "@type": "Person", "name": "Muhammad Talha", "url": "https://mtalhasajid.dev" }
   }
   </script>
   <script type="application/ld+json">
@@ -78,7 +108,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="wrap hero-inner">
-      <h1 class="wordmark">Munshi</h1>
+      <h1 class="wordmark">Munshi<span class="sr-only"> — court hearing dates on your Google Calendar, automatically</span></h1>
       <div class="hero-rule"></div>
       <p class="hero-tag">Munshi is a free Windows app that keeps a lawyer's Google Calendar in sync with court hearing dates from the District Judiciary Punjab. Add a case once, and it checks for the next hearing every day, automatically, so you never miss one.</p>
       <div class="hero-cta">
