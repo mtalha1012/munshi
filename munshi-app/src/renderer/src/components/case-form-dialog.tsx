@@ -31,14 +31,18 @@ interface Props {
   onSaved: (cases: CaseItem[]) => void
 }
 
-const newSpec = (title: string): CaseEventSpec => ({ title, allDay: true, reminderMins: 1440 })
+const newSpec = (): CaseEventSpec => ({
+  title: '',
+  useSiteTitle: true,
+  allDay: true,
+  reminderMins: 1440
+})
 
 export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props): JSX.Element {
   const hasTrackedEvent = Boolean(initial?.trackedEventId)
   const [caseNumber, setCaseNumber] = useState('')
   const [district, setDistrict] = useState('Lahore')
-  const [name, setName] = useState('')
-  const [spec, setSpec] = useState<CaseEventSpec>(newSpec(''))
+  const [spec, setSpec] = useState<CaseEventSpec>(newSpec())
   const [linkedEventId, setLinkedEventId] = useState<string | null>(null)
   const [enabled, setEnabled] = useState(true)
   const [trackStage, setTrackStage] = useState(false)
@@ -47,39 +51,22 @@ export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props):
   const [busyLabel, setBusyLabel] = useState('')
   const [savedId, setSavedId] = useState<string | null>(null)
 
-  const [titleSynced, setTitleSynced] = useState(true)
-
   useEffect(() => {
     if (!open) return
-    const initialSpec = initial?.event ?? newSpec('')
+    const initialSpec = initial?.event ?? newSpec()
     setCaseNumber(initial?.caseNumber ?? '')
     setDistrict(initial?.district ?? 'Lahore')
-    setName(initial?.name ?? '')
     setSpec(initialSpec)
     setLinkedEventId(initial?.trackedEventId ?? null)
     setEnabled(initial?.enabled ?? true)
     setTrackStage(initial?.trackStage ?? false)
     setTrackJudges(initial?.trackJudges ?? false)
     setSavedId(initial?.id ?? null)
-    setTitleSynced(!initial || initialSpec.title === initial.name)
   }, [open, initial])
-
-  useEffect(() => {
-    if (titleSynced) setSpec((s) => ({ ...s, title: name }))
-  }, [name, titleSynced])
-
-  const handleSpecChange = (s: CaseEventSpec): void => {
-    setTitleSynced(s.title === name)
-    setSpec(s)
-  }
 
   const save = async (force = false): Promise<void> => {
     if (!caseNumber.trim()) {
       toast.error('Case number is required')
-      return
-    }
-    if (!name.trim()) {
-      toast.error('Case name is required')
       return
     }
 
@@ -91,9 +78,8 @@ export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props):
         id: idToSave,
         caseNumber: caseNumber.trim(),
         district,
-        name: name.trim(),
         enabled,
-        event: { ...spec, title: spec.title.trim() || name.trim() },
+        event: { ...spec, title: spec.title.trim() },
         trackedEventId: linkedEventId,
         trackStage,
         trackJudges
@@ -140,7 +126,9 @@ export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props):
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="case-dialog">
         <DialogHeader>
-          <DialogTitle>{initial ? 'Edit case' : 'Add a case'}</DialogTitle>
+          <DialogTitle>
+            {initial ? `Edit — ${initial.titleFromSite ?? initial.caseNumber}` : 'Add a case'}
+          </DialogTitle>
           <DialogDescription>
             Munshi checks this case every day and keeps its calendar event on the next hearing
             date.
@@ -180,21 +168,6 @@ export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props):
             </p>
           </div>
 
-          <div className="field">
-            <Label htmlFor="name">Case name</Label>
-            <Input
-              id="name"
-              placeholder="e.g. Party A vs Party B"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <p className="field-help">
-              {hasTrackedEvent || linkedEventId
-                ? "A name you'll recognise in your case list."
-                : "A name you'll recognise. This is what your calendar event will be called."}
-            </p>
-          </div>
-
           {hasTrackedEvent ? (
             <div className="panel">
               <Label>Calendar event</Label>
@@ -207,9 +180,10 @@ export function CaseFormDialog({ open, onOpenChange, initial, onSaved }: Props):
             <>
               <CaseEventFields
                 spec={spec}
-                onSpecChange={handleSpecChange}
+                onSpecChange={setSpec}
                 linkedEventId={linkedEventId}
                 onLinkedEventIdChange={setLinkedEventId}
+                titleFromSite={initial?.titleFromSite ?? null}
               />
 
               {linkedEventId && (
