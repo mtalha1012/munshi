@@ -47,7 +47,12 @@ vi.mock('./services/auth', () => ({
   signOut: vi.fn()
 }))
 
-const specDefault: CaseEventSpec = { title: 'Party A vs Party B', allDay: true, reminderMins: 1440 }
+const specDefault: CaseEventSpec = {
+  title: 'Party A vs Party B',
+  useSiteTitle: false,
+  allDay: true,
+  reminderMins: 1440
+}
 
 async function ensureHearingEvent(args: {
   trackedEventId: string | null
@@ -77,7 +82,12 @@ async function ensureHearingEvent(args: {
 vi.mock('./services/calendar', () => ({
   ensureHearingEvent,
   listUpcoming: vi.fn(),
-  defaultSpec: (title: string): CaseEventSpec => ({ title, allDay: true, reminderMins: 1440 })
+  defaultSpec: (): CaseEventSpec => ({
+    title: '',
+    useSiteTitle: true,
+    allDay: true,
+    reminderMins: 1440
+  })
 }))
 
 async function lookup(): Promise<{ ok: boolean; nextHearing: string; allDates: string[] }> {
@@ -106,7 +116,7 @@ beforeEach(() => {
       id: 'c1',
       caseNumber: '100200300',
       district: 'Lahore',
-      name: 'Party A vs Party B',
+      titleFromSite: null,
       enabled: true,
       event: specDefault,
       trackedEventId: null,

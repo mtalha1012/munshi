@@ -52,6 +52,7 @@ import { setCases as fakeSetCases } from './store'
 
 const spec = (over: Partial<CaseEventSpec> = {}): CaseEventSpec => ({
   title: 'Party A vs Party B',
+  useSiteTitle: false,
   allDay: true,
   reminderMins: 1440,
   ...over
@@ -62,7 +63,7 @@ function makeCase(over: Partial<CaseItem> = {}): CaseItem {
     id: over.id ?? 'c1',
     caseNumber: over.caseNumber ?? '100200300',
     district: over.district ?? 'Lahore',
-    name: over.name ?? 'Party A vs Party B',
+    titleFromSite: over.titleFromSite ?? null,
     enabled: over.enabled ?? true,
     event: over.event ?? spec(),
     trackedEventId: over.trackedEventId ?? null,
@@ -246,5 +247,55 @@ describe('updateCaseAfterSync — re-reads before writing (no clobber)', () => {
     expect(ids).toContain('injected')
     expect(ids).toContain('a')
     expect(h.cases.find((c) => c.id === 'a')?.trackedEventId).toBe('evt-a')
+  })
+})
+
+describe('runSync titleFromSite handling', () => {
+  beforeEach(() => {
+    h.cases = []
+    h.lastRun = null
+    h.ensureHearingEvent.mockReset()
+    h.lookup.mockReset()
+    h.scraperInit.mockReset()
+    h.scraperClose.mockReset()
+  })
+
+  it('writes titleFromSite when the scraper returns a title', async () => {
+    fakeSetCases([makeCase()])
+    h.lookup.mockResolvedValue({
+      ...okLookup,
+      title: 'Doctor Dina khan VS Shoukat Babar'
+    })
+    h.ensureHearingEvent.mockResolvedValue(ensured())
+
+    await runSync()
+
+    expect(h.cases[0].titleFromSite).toBe('Doctor Dina khan VS Shoukat Babar')
+  })
+
+  it('does not clobber an existing titleFromSite when the scraper omits it', async () => {
+    fakeSetCases([makeCase({ titleFromSite: 'Previously fetched title' })])
+    h.lookup.mockResolvedValue({ ...okLookup /* no title */ })
+    h.ensureHearingEvent.mockResolvedValue(ensured())
+
+    await runSync()
+
+    expect(h.cases[0].titleFromSite).toBe('Previously fetched title')
+  })
+
+  it('passes the resolved effective title to ensureHearingEvent', async () => {
+    fakeSetCases([
+      makeCase({
+        titleFromSite: 'Doctor Dina khan VS Shoukat Babar',
+        event: spec({ useSiteTitle: true, title: 'ignored custom' })
+      })
+    ])
+    h.lookup.mockResolvedValue({ ...okLookup, title: 'Doctor Dina khan VS Shoukat Babar' })
+    h.ensureHearingEvent.mockResolvedValue(ensured())
+
+    await runSync()
+
+    const call = h.ensureHearingEvent.mock.calls[0][0]
+    expect(call.spec.title).toBe('Doctor Dina khan VS Shoukat Babar')
   })
 })

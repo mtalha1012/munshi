@@ -52,7 +52,12 @@ vi.mock('./services/calendar', () => ({
   ensureHearingEvent: h.ensureHearingEvent,
   listUpcoming: h.listUpcoming,
   listPast: h.listPast,
-  defaultSpec: (title: string): CaseEventSpec => ({ title, allDay: true, reminderMins: 1440 })
+  defaultSpec: (): CaseEventSpec => ({
+    title: '',
+    useSiteTitle: true,
+    allDay: true,
+    reminderMins: 1440
+  })
 }))
 vi.mock('./services/scraper', () => ({ lookupOnce: h.lookupOnce }))
 
@@ -60,6 +65,7 @@ import { registerIpc } from './ipc'
 
 const spec = (over: Partial<CaseEventSpec> = {}): CaseEventSpec => ({
   title: 'Party A vs Party B',
+  useSiteTitle: false,
   allDay: true,
   reminderMins: 1440,
   ...over
@@ -70,7 +76,7 @@ function makeCase(over: Partial<CaseItem> = {}): CaseItem {
     id: over.id ?? 'c1',
     caseNumber: over.caseNumber ?? '100200300',
     district: over.district ?? 'Lahore',
-    name: over.name ?? 'Party A vs Party B',
+    titleFromSite: over.titleFromSite ?? null,
     enabled: over.enabled ?? true,
     event: over.event ?? spec(),
     trackedEventId: over.trackedEventId ?? null,
@@ -114,7 +120,6 @@ describe('cases:save — new case', () => {
     const input: SaveCaseInput = {
       caseNumber: '  100200300  ',
       district: 'Lahore',
-      name: '  Party A vs Party B  ',
       event: spec(),
       enabled: true
     }
@@ -123,20 +128,24 @@ describe('cases:save — new case', () => {
     const c = result[0]
     expect(c.id).toBeTruthy()
     expect(c.caseNumber).toBe('100200300')
-    expect(c.name).toBe('Party A vs Party B')
+    expect(c.event.title).toBe('Party A vs Party B')
+    expect(c.titleFromSite).toBeNull()
     expect(c.trackedEventId).toBeNull()
     expect(c.needsAttention).toBe(true)
   })
 
-  it('falls back to the case number for a blank name, and to defaultSpec for no event', async () => {
+  it('falls back to defaultSpec for no event', async () => {
     const input = {
       caseNumber: '555',
-      district: 'Lahore',
-      name: '   '
+      district: 'Lahore'
     } as unknown as SaveCaseInput
     const result = (await call<CaseItem[]>('cases:save', input))!
-    expect(result[0].name).toBe('555')
-    expect(result[0].event).toEqual({ title: '555', allDay: true, reminderMins: 1440 })
+    expect(result[0].event).toEqual({
+      title: '',
+      useSiteTitle: true,
+      allDay: true,
+      reminderMins: 1440
+    })
   })
 })
 
@@ -145,7 +154,7 @@ describe('cases:save — existing case', () => {
     h.cases = [
       makeCase({
         id: 'c1',
-        name: 'Old name',
+        event: spec({ title: 'Old name' }),
         trackedEventId: 'evt-existing',
         trackedHearingDate: '2026-09-07'
       })
@@ -154,12 +163,11 @@ describe('cases:save — existing case', () => {
       id: 'c1',
       caseNumber: '100200300',
       district: 'Lahore',
-      name: 'New name',
       event: spec({ title: 'New name' })
     }
     await call('cases:save', input)
     const c = h.cases[0]
-    expect(c.name).toBe('New name')
+    expect(c.event.title).toBe('New name')
     expect(c.trackedEventId).toBe('evt-existing')
     expect(c.trackedHearingDate).toBe('2026-09-07')
   })

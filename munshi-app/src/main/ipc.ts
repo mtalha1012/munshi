@@ -6,6 +6,7 @@ import { runSync, getLastRun } from './services/sync'
 import { applyLoginItem } from './services/scheduler'
 import { checkForUpdates, quitAndInstallUpdate } from './services/updater'
 import { ensureHearingEvent, listUpcoming, listPast, defaultSpec } from './services/calendar'
+import { resolveEventSpec } from './services/calendar/event-spec'
 import { lookupOnce } from './services/scraper'
 import { calendarLock } from './services/mutex'
 import type { CaseItem, Settings, SyncProgress, SaveCaseInput } from '../shared/types'
@@ -31,7 +32,6 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
 
   ipcMain.handle('cases:save', (_e, input: SaveCaseInput) => {
     const cases = getCases()
-    const name = input.name.trim() || input.caseNumber.trim()
     if (input.id) {
       const idx = cases.findIndex((c) => c.id === input.id)
       if (idx !== -1) {
@@ -39,7 +39,6 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
           ...cases[idx],
           caseNumber: input.caseNumber.trim(),
           district: input.district.trim(),
-          name,
           enabled: input.enabled ?? cases[idx].enabled,
           event: input.event,
           trackedEventId: input.trackedEventId ?? cases[idx].trackedEventId,
@@ -53,9 +52,9 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
       id: randomUUID(),
       caseNumber: input.caseNumber.trim(),
       district: input.district.trim(),
-      name,
+      titleFromSite: null,
       enabled: input.enabled ?? true,
-      event: input.event ?? defaultSpec(name),
+      event: input.event ?? defaultSpec(),
       trackedEventId: input.trackedEventId ?? null,
       trackedHearingDate: null,
       lastKnownHearing: null,
@@ -101,17 +100,22 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
       }
 
       try {
+        const resolvedSpec = resolveEventSpec(
+          c.event,
+          lookup.title?.trim() || c.titleFromSite,
+          c.caseNumber
+        )
         const res = await ensureHearingEvent({
           calendarId: getSettings().calendarId || 'primary',
           trackedEventId: c.trackedEventId,
-          spec: c.event,
+          spec: resolvedSpec,
           hearingDate: lookup.nextHearing,
           stage: lookup.stage,
           judge: lookup.judge,
           trackStage: c.trackStage,
           trackJudges: c.trackJudges
         })
-        patchCase(caseId, {
+        const patch: Partial<CaseItem> = {
           event: res.spec,
           trackedEventId: res.eventId,
           trackedHearingDate: res.hearingDate,
@@ -119,7 +123,10 @@ export function registerIpc(broadcast: (p: SyncProgress) => void): void {
           lastSyncedAt: new Date().toISOString(),
           lastStatus: res.message,
           needsAttention: false
-        })
+        }
+        const newTitle = lookup.title?.trim()
+        if (newTitle) patch.titleFromSite = newTitle
+        patchCase(caseId, patch)
         return { ok: true, message: res.message, nextHearing: lookup.nextHearing }
       } catch (e) {
         patchCase(caseId, { needsAttention: true, lastStatus: (e as Error).message })

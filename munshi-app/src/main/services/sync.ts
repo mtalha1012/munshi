@@ -1,6 +1,7 @@
 import { getCases, setCases, getStore, setSettings, getSettings } from './store'
 import { authStatus } from './auth'
 import { ensureHearingEvent } from './calendar'
+import { resolveEventSpec } from './calendar/event-spec'
 import { ScraperSession } from './scraper'
 import { calendarLock } from './mutex'
 import type { SyncRunResult, SyncCaseResult, SyncProgress, CaseItem } from '../../shared/types'
@@ -107,10 +108,15 @@ export async function runSync(onProgress?: (p: SyncProgress) => void): Promise<S
             updateCaseAfterSync(c.id, result, { needsAttention: true })
           } else {
             try {
+              const resolvedSpec = resolveEventSpec(
+                c.event,
+                lookup.title?.trim() || c.titleFromSite,
+                c.caseNumber
+              )
               const res = await ensureHearingEvent({
                 calendarId: getSettings().calendarId || 'primary',
                 trackedEventId: c.trackedEventId,
-                spec: c.event,
+                spec: resolvedSpec,
                 hearingDate: lookup.nextHearing,
                 stage: lookup.stage,
                 judge: lookup.judge,
@@ -138,12 +144,15 @@ export async function runSync(onProgress?: (p: SyncProgress) => void): Promise<S
                 nextHearing: lookup.nextHearing,
                 message: res.message
               }
-              updateCaseAfterSync(c.id, result, {
+              const patch: Partial<CaseItem> = {
                 needsAttention: false,
                 trackedEventId: res.eventId,
                 trackedHearingDate: res.hearingDate,
                 event: res.spec
-              })
+              }
+              const newTitle = lookup.title?.trim()
+              if (newTitle) patch.titleFromSite = newTitle
+              updateCaseAfterSync(c.id, result, patch)
             } catch (e) {
               failed++
               result = {
