@@ -131,8 +131,12 @@ export function CasesView(): JSX.Element {
                 {cases.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell>
-                      <div className="case-number">{c.caseNumber}</div>
-                      {c.name ? <div className="case-name">{c.name}</div> : null}
+                      <div className="case-number">
+                        {c.titleFromSite ?? c.caseNumber}
+                      </div>
+                      {c.titleFromSite ? (
+                        <div className="case-name">{c.caseNumber}</div>
+                      ) : null}
                       {c.needsAttention && (
                         <div className="case-warning">
                           <AlertTriangle className="icon-sm" aria-hidden="true" />
