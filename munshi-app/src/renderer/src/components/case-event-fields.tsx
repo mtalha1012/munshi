@@ -99,13 +99,15 @@ export interface CaseEventFieldsProps {
   onSpecChange: (s: CaseEventSpec) => void
   linkedEventId: string | null
   onLinkedEventIdChange: (id: string | null) => void
+  titleFromSite: string | null
 }
 
 export function CaseEventFields({
   spec,
   onSpecChange,
   linkedEventId,
-  onLinkedEventIdChange
+  onLinkedEventIdChange,
+  titleFromSite
 }: CaseEventFieldsProps): JSX.Element {
   const [upcoming, setUpcoming] = useState<UpcomingEvent[] | null>(null)
   const [past, setPast] = useState<UpcomingEvent[] | null>(null)
@@ -184,15 +186,37 @@ export function CaseEventFields({
         </TabsList>
 
         <TabsContent value="create" className="event-tab-panel">
-          <div className="field">
-            <Label htmlFor="evtTitle">Event title</Label>
-            <Input
-              id="evtTitle"
-              value={spec.title}
-              placeholder="e.g. Party A vs Party B"
-              onChange={(e) => set({ title: e.target.value })}
+          <div className="event-toggle-row">
+            <div>
+              <Label htmlFor="useSiteTitle">Use case title from the court website</Label>
+              <p className="field-help">
+                Munshi reads the title from the site each sync.
+              </p>
+            </div>
+            <Switch
+              id="useSiteTitle"
+              checked={spec.useSiteTitle}
+              onCheckedChange={(v) => set({ useSiteTitle: v })}
             />
           </div>
+
+          {spec.useSiteTitle ? (
+            <p className="field-help">
+              {titleFromSite
+                ? <>Will use: <em>{titleFromSite}</em></>
+                : 'Munshi will fetch the title on first sync. Until then, the event is named after the case number.'}
+            </p>
+          ) : (
+            <div className="field">
+              <Label htmlFor="evtTitle">Event title</Label>
+              <Input
+                id="evtTitle"
+                value={spec.title}
+                placeholder="e.g. Party A vs Party B"
+                onChange={(e) => set({ title: e.target.value })}
+              />
+            </div>
+          )}
 
           <div className="event-toggle-row">
             <div>
